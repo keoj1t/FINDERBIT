@@ -1,0 +1,77 @@
+name: CLC leads
+
+on:
+  # Каждый день в 09:00 по Астане (UTC+5). GitHub может запускать с задержкой до часа.
+  schedule:
+    - cron: "0 4 * * *"
+  # Ручной запуск: вкладка Actions -> CLC leads -> Run workflow
+  workflow_dispatch:
+    inputs:
+      args:
+        description: "Режим запуска"
+        type: choice
+        default: ""
+        options:
+          - ""
+          - "--manual"
+          - "--manual --dry-run"
+          - "--dry-run"
+  # Положили свежий news.txt и запушили -> запуск в ручном режиме (без API Gemini)
+  push:
+    paths:
+      - news.txt
+
+concurrency: clc-leads
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # state.json (что уже обработано) хранится в кэше между запусками
+      - uses: actions/cache/restore@v4
+        with:
+          path: output/state.json
+          key: state-${{ github.run_id }}
+          restore-keys: state-
+
+      - name: Run
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EVENT: ${{ github.event_name }}
+          INPUT_ARGS: ${{ inputs.args }}
+        run: |
+          case "$EVENT" in
+            push) ARGS="--manual" ;;
+            workflow_dispatch) ARGS="$INPUT_ARGS" ;;
+            *) ARGS="" ;;
+          esac
+          echo "Running: python main.py $ARGS"
+          python main.py $ARGS
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: output/state.json
+          key: state-${{ github.run_id }}
+
+      # Excel, JSON и логи можно скачать на странице запуска (хранятся 14 дней)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: output
+          path: output/
+          retention-days: 14
+          if-no-files-found: ignore
