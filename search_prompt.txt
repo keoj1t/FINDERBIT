@@ -1,0 +1,44 @@
+Today is 11.11.2026. Search the web for B2B construction, reconstruction and repair projects in Kazakhstan that could become clients for CLC Company, a supplier of interior finishing materials: laminated wall and ceiling panels, commercial PVC and other flooring, acoustic solutions, HPL panels, glass partitions, adhesives and substrate preparation systems.
+
+Find projects, tenders and price requests published or updated during the last {days} days.
+
+Types of work to cover:
+{work_types}
+
+Types of objects to cover:
+{object_types}
+
+Regions:
+{regions}
+
+Useful search keywords: {keywords}.
+Ignore: {exclude}.
+
+Prefer projects at the design, tender, price-request, construction start, or construction stage where finishing work has not started yet and material suppliers can still be selected. For tenders and price requests, put the submission deadline (date and time) in the planned timeline.
+
+Where to look:
+{sources}
+
+For each project, report:
+- project name;
+- city and region;
+- object type;
+- type of work: new construction, reconstruction, repair or capital repair, or landscaping;
+- customer, its BIN, its field of activity, a one-sentence description of the customer, and its official website;
+- general contractor;
+- finishing subcontractor, if known;
+- current stage;
+- planned timeline (or tender deadline);
+- budget, if published;
+- public contact person, phone and email;
+- direct link to the page where you found the information;
+- publication date.
+
+Rules:
+- Use only facts found on the pages you read. Do not invent names, BIN numbers, phone numbers, emails, websites, budgets, dates, or links.
+- Write every phone number, email, BIN and link exactly as it appears on the page.
+- In every project block write the full direct URL of the source page as plain text (https://...). Do not use shortened or redirect links, and do not put links only in citations.
+- If a fact is not found, write "Не установлено".
+- Skip completed projects and news older than {days} days.
+- Return up to {max_projects} projects as plain text, one block per project, written in Russian.
+- If you find nothing reliable, say so instead of filling the answer with weak results.

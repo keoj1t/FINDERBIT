@@ -1,0 +1,109 @@
+2026-11-11 12:46:55,212 [INFO] Starting pipeline
+2026-11-11 12:46:55,213 [INFO] Searching the web with model 'gemini-3.5-flash-lite'
+2026-11-11 12:46:55,682 [ERROR] Gemini returned HTTP 429 for model 'gemini-3.5-flash-lite': {
+  "error": {
+    "code": 429,
+    "message": "You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://aistudio.google.com/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ",
+    "status": 
+2026-11-11 12:46:55,686 [ERROR] Поиск не вернул результат (см. лог)
+2026-11-11 12:46:55,686 [INFO] 
+Отчёт о выгрузке за 2026-11-11 (тестовый режим: CRM не изменялась)
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 1
+  - Поиск не вернул результат (см. лог)
+2026-11-11 12:56:53,976 [INFO] Starting pipeline
+2026-11-11 12:56:53,976 [INFO] Using manual search text from news.txt
+2026-11-11 12:57:00,621 [INFO] Found: 4, matched: 4
+2026-11-11 12:57:00,622 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 12:57:00,641 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 12:57:05,001 [INFO] [DRY-RUN] Would add info to lead #2
+2026-11-11 12:57:08,745 [INFO] [DRY-RUN] Would add info to lead #2
+2026-11-11 12:57:12,627 [INFO] [DRY-RUN] Would add info to lead #2
+2026-11-11 12:57:16,924 [INFO] [DRY-RUN] Would add info to lead #2
+2026-11-11 12:57:16,924 [INFO] 
+Отчёт о выгрузке за 2026-11-11 (тестовый режим: CRM не изменялась)
+Найдено компаний/объектов: 4
+Соответствуют критериям: 4
+Создано лидов: 0
+Исключено дублей: 4 (в существующие карточки добавлена новая информация: 4)
+Ошибок при поиске или передаче данных: 0
+2026-11-11 13:02:46,262 [INFO] Starting pipeline
+2026-11-11 13:02:46,262 [INFO] Searching the web with model 'gemini-3.5-flash-lite'
+2026-11-11 13:02:46,743 [WARNING] Gemini API недоступен (HTTP 429 для модели gemini-3.5-flash-lite). Переключаюсь на ручной режим: news.txt
+2026-11-11 13:02:46,745 [INFO] Using manual search text from news.txt
+2026-11-11 13:02:53,143 [INFO] Found: 5, matched: 5
+2026-11-11 13:02:53,146 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 13:02:53,166 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 13:03:00,174 [INFO] [DRY-RUN] Would create lead: ТОО «Мобайл Телеком-Сервис» — Демонтаж бэк-офиса перед реконструкцией и отделкой
+2026-11-11 13:03:05,747 [INFO] [DRY-RUN] Would create lead: АО «Народный Банк Казахстана» — Строительно-монтажные и ремонтные работы в Алматинском областном филиале АО «Народный Банк Казахстана»
+2026-11-11 13:03:10,056 [INFO] [DRY-RUN] Would create lead: ТОО «Қамқор Вагон» — Текущий ремонт санитарных узлов и помещений административного здания ТОО «Қамқор Вагон»
+2026-11-11 13:03:15,679 [INFO] [DRY-RUN] Would create lead: АО «Народный Банк Казахстана» — Капитальный ремонт объекта Жамбылского областного филиала АО «Народный Банк Казахстана»
+2026-11-11 13:03:21,767 [INFO] [DRY-RUN] Would create lead: АО «Народный Банк Казахстана» — Модернизация и расширение зоны обслуживания АТМ в здании ЦПС №1 Костанайского ОФ АО «Народного Банка Казахстана»
+2026-11-11 13:03:21,767 [INFO] 
+Отчёт о выгрузке за 2026-11-11 (тестовый режим: CRM не изменялась)
+Найдено компаний/объектов: 5
+Соответствуют критериям: 5
+Создано лидов: 5
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 0
+2026-11-11 13:05:06,735 [INFO] Starting pipeline
+2026-11-11 13:05:06,736 [INFO] Using manual search text from news.txt
+2026-11-11 13:05:29,509 [INFO] Found: 5, matched: 5
+2026-11-11 13:05:29,509 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 13:05:29,524 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 13:05:38,223 [INFO] Lead created in Bitrix24, ID: 10
+2026-11-11 13:05:45,244 [INFO] Lead created in Bitrix24, ID: 12
+2026-11-11 13:05:45,949 [INFO] Match for 'АО «Народный Банк Казахстана» — Капитальный ремонт объекта Жамбылского областного филиала АО «Народный Банк Казахстана»': exact, причина: БИН, lead #12 «[AI-CLC] АО «Народный Банк Казахстана» — Строительно-монтажные и ремонтные работы в Алматинском областном филиале АО «Народный Банк Казахстана»», тот же объект: False
+2026-11-11 13:05:46,712 [INFO] New info added to lead #12
+2026-11-11 13:05:47,467 [INFO] Match for 'АО «Народный Банк Казахстана» — Модернизация и расширение зоны обслуживания АТМ в здании ЦПС №1 Костанайского ОФ АО «Народного Банка Казахстана»': exact, причина: БИН, lead #12 «[AI-CLC] АО «Народный Банк Казахстана» — Строительно-монтажные и ремонтные работы в Алматинском областном филиале АО «Народный Банк Казахстана»», тот же объект: False
+2026-11-11 13:05:48,169 [INFO] New info added to lead #12
+2026-11-11 13:05:53,740 [INFO] Lead created in Bitrix24, ID: 14
+2026-11-11 13:05:53,741 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 5
+Соответствуют критериям: 5
+Создано лидов: 3
+Исключено дублей: 2 (в существующие карточки добавлена новая информация: 2)
+Ошибок при поиске или передаче данных: 0
+2026-11-11 13:14:26,880 [INFO] Starting pipeline
+2026-11-11 13:14:26,881 [INFO] Using manual search text from news.txt
+2026-11-11 13:14:34,021 [INFO] Found: 4, matched: 4
+2026-11-11 13:14:34,022 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 13:14:34,038 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 13:14:38,448 [INFO] Lead created in Bitrix24, ID: 16
+2026-11-11 13:14:44,453 [INFO] Lead created in Bitrix24, ID: 18
+2026-11-11 13:14:49,880 [INFO] Lead created in Bitrix24, ID: 20
+2026-11-11 13:14:54,380 [INFO] Lead created in Bitrix24, ID: 22
+2026-11-11 13:14:54,381 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 4
+Соответствуют критериям: 4
+Создано лидов: 4
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 0
+2026-11-11 13:26:10,446 [INFO] Starting pipeline
+2026-11-11 13:26:10,446 [INFO] Using manual search text from news.txt
+2026-11-11 13:26:18,016 [INFO] Found: 7, matched: 7
+2026-11-11 13:26:18,017 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 13:26:18,031 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 13:26:18,031 [INFO] Skipped, already processed on 2026-11-11: ГУ «Управление строительства, архитектуры и градостроительства Восточно-Казахстанской области» — Многопрофильная больница на 300 коек в г. Усть-Каменогорск
+2026-11-11 13:26:18,031 [INFO] Skipped, already processed on 2026-11-11: ТОО «Orient Group KZ» — Гостиничный комплекс международного бренда Novotel в г. Павлодар
+2026-11-11 13:26:18,031 [INFO] Skipped, already processed on 2026-11-11: ТОО «Trade Market 1» — 16-этажный гостинично-офисный комплекс Hilton в г. Алматы
+2026-11-11 13:26:18,031 [INFO] Skipped, already processed on 2026-11-11: AKASHI Data Center PLC — Гипермасштабируемый дата-центр уровня Tier IV «Akashi Data Center» в г. Астане
+2026-11-11 13:26:26,095 [INFO] Lead created in Bitrix24, ID: 24
+2026-11-11 13:26:31,830 [INFO] Lead created in Bitrix24, ID: 26
+2026-11-11 13:26:36,700 [INFO] Lead created in Bitrix24, ID: 28
+2026-11-11 13:26:36,701 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 13:26:36,721 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 13:26:36,721 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 7
+Соответствуют критериям: 7
+Создано лидов: 3
+Исключено дублей: 4
+Ошибок при поиске или передаче данных: 0
+2026-11-11 13:26:37,229 [INFO] Telegram summary sent
+2026-11-11 13:26:37,709 [INFO] Telegram Excel sent: report_2026-11-11.xlsx
