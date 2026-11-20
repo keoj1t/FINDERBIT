@@ -4,7 +4,7 @@ on:
   # Каждый день в 09:00 по Астане (UTC+5). GitHub может запускать с задержкой до часа.
   schedule:
     - cron: "0 4 * * *"
-  # Ручной запуск: вкладка Actions -> CLC leads -> Run workflow
+  # Запуск по кнопке: вкладка Actions -> CLC leads -> Run workflow
   workflow_dispatch:
     inputs:
       args:
@@ -13,14 +13,7 @@ on:
         default: ""
         options:
           - ""
-          - "--manual"
-          - "--manual --dry-run"
           - "--dry-run"
-  # Положили свежий news.txt и запушили -> запуск в ручном режиме (без API Gemini)
-  push:
-    paths:
-      - news.txt
-
 concurrency: clc-leads
 
 jobs:
@@ -46,7 +39,10 @@ jobs:
 
       - name: Run
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL }}
+          OPENAI_SEARCH_MODEL: ${{ vars.OPENAI_SEARCH_MODEL }}
+          OPENAI_EXTRACT_MODEL: ${{ vars.OPENAI_EXTRACT_MODEL }}
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -54,7 +50,6 @@ jobs:
           INPUT_ARGS: ${{ inputs.args }}
         run: |
           case "$EVENT" in
-            push) ARGS="--manual" ;;
             workflow_dispatch) ARGS="$INPUT_ARGS" ;;
             *) ARGS="" ;;
           esac

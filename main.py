@@ -7,7 +7,6 @@ import os
 import re
 import sys
 import time
-from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -25,13 +24,9 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
 PROMPT_FILE = BASE_DIR / "prompt.txt"
-SEARCH_PROMPT_FILE = BASE_DIR / "search_prompt.txt"
-CRITERIA_FILE = BASE_DIR / "criteria.json"
 OUTPUT_DIR = BASE_DIR / "output"
 STATE_FILE = OUTPUT_DIR / "state.json"
-# Ручной режим: текст поиска из Google AI Studio и (необязательно) готовый JSON.
-NEWS_TEXT_FILE = BASE_DIR / "news.txt"
-NEWS_JSON_FILE = BASE_DIR / "news.json"
+
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 logging.basicConfig(
@@ -44,36 +39,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-SEARCH_MODEL = os.getenv("GEMINI_SEARCH_MODEL", "gemini-3.5-flash-lite")
-EXTRACT_MODEL = os.getenv("GEMINI_EXTRACT_MODEL", "gemini-3.1-flash-lite")
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_BASE_URL = (os.getenv("OPENAI_BASE_URL") or "https://api.openai.com/v1").rstrip("/")
+SEARCH_MODEL = os.getenv("OPENAI_SEARCH_MODEL", "gpt-4o-mini")
+EXTRACT_MODEL = os.getenv("OPENAI_EXTRACT_MODEL", "gpt-4o-mini")
 
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
-# Стадия лида. В Bitrix24 первая стадия воронки лидов имеет код NEW
-# (в вашем портале она может называться «Неразобранное»). Если стадия
-# называется иначе или код другой - задайте BITRIX_LEAD_STATUS в .env.
 BITRIX_LEAD_STATUS = os.getenv("BITRIX_LEAD_STATUS", "NEW")
-# Необязательно: код источника «ИИ-поиск», если он уже создан в CRM.
 BITRIX_SOURCE_ID = os.getenv("BITRIX_SOURCE_ID")
-# Необязательно: код пользовательского поля лида для БИН (например UF_CRM_BIN).
 BITRIX_BIN_FIELD = os.getenv("BITRIX_BIN_FIELD")
-# Необязательно: код поля БИН в реквизитах компании (для поиска дублей).
 BITRIX_REQUISITE_BIN_FIELD = os.getenv("BITRIX_REQUISITE_BIN_FIELD")
-# Необязательно: ID ответственного за создаваемые лиды.
 BITRIX_ASSIGNED_BY_ID = os.getenv("BITRIX_ASSIGNED_BY_ID")
-# Пауза между запросами: у облачного Bitrix24 лимит около 2 запросов в секунду.
 BITRIX_PAUSE = float(os.getenv("BITRIX_PAUSE", "0.5"))
 
-# Уведомления в Telegram (необязательно): токен бота и ID чата.
 TELEGRAM_BOT_TOKEN = (os.getenv("TELEGRAM_BOT_TOKEN") or "").strip().strip("\"'")
 TELEGRAM_CHAT_ID = (os.getenv("TELEGRAM_CHAT_ID") or "").strip().strip("\"'")
 TELEGRAM_API = "https://api.telegram.org/bot{token}/{method}"
 TELEGRAM_TIMEOUT = 60
 TELEGRAM_MAX_LEADS_IN_MESSAGE = 15
 
-GEMINI_TIMEOUT = 120
-GEMINI_MAX_TOKENS = int(os.getenv("GEMINI_MAX_TOKENS", "16384"))
+OPENAI_TIMEOUT = int(os.getenv("OPENAI_TIMEOUT", "120"))
+OPENAI_MAX_TOKENS = int(os.getenv("OPENAI_MAX_TOKENS", "16384"))
 BITRIX_TIMEOUT = 15
 BITRIX_RETRIES = 3
 BIN_LENGTH = 12
@@ -84,7 +70,6 @@ SOURCE_CODE = "AI_SEARCH"
 TITLE_PREFIX = "[AI-CLC]"
 REVIEW_PREFIX = "[ПРОВЕРИТЬ ДУБЛЬ]"
 
-# Статус каждого лида в CRM (колонка «Статус в CRM» в Excel).
 CRM_NOT_SENT = "Не отправлялся в CRM"
 CRM_CREATED = "Создан в CRM"
 CRM_CREATED_REVIEW = "Создан в CRM (проверить дубль)"
@@ -142,15 +127,55 @@ LEAD_COLUMNS = [
     ("priority", "Приоритет", 12),
     ("crm_status", "Статус в CRM", 30),
 ]
-SOURCE_COLUMNS = [
-    ("project_name", "Объект", 40),
-    ("source_link", "Ссылка на источник", 60),
-    ("publication_date", "Дата публикации", 18),
-]
 LEAD_FIELDS = [key for key, _, _ in LEAD_COLUMNS]
 ANALYTICS_FIELDS = ("project_name", "fact", "impact", "action")
 
-# Поля и подписи для комментария в карточке лида.
+RADAR_COLUMNS = [
+    ("project_name", "Объект / Наименование", 40),
+    ("city", "Город", 18),
+    ("company_name", "Заказчик / Девелопер", 32),
+    ("bin", "БИН", 16),
+    ("general_contractor", "Генподрядчик", 32),
+    ("stage", "Стадия", 28),
+    ("timeline", "Сроки", 22),
+    ("clc_demand", "Потребность в продукции CLC", 40),
+    ("priority", "Приоритет", 12),
+]
+EDUCATION_COLUMNS = [
+    ("project_name", "Объект", 40),
+    ("city", "Город", 18),
+    ("region", "Регион", 24),
+    ("object_type", "Тип объекта", 24),
+    ("company_name", "Заказчик", 32),
+    ("bin", "БИН", 16),
+    ("general_contractor", "Генподрядчик", 32),
+    ("stage", "Стадия", 28),
+    ("timeline", "Сроки", 22),
+    ("budget", "Бюджет", 20),
+    ("clc_demand", "Потребность в продукции CLC", 40),
+    ("contact_person", "Контакт", 24),
+    ("phone", "Телефон", 20),
+    ("email", "Email", 26),
+    ("source_link", "Источник", 35),
+    ("priority", "Приоритет", 12),
+]
+TODAY_COLUMNS = [
+    ("project_name", "Объект", 40),
+    ("company_name", "Заказчик", 32),
+    ("general_contractor", "Генподрядчик", 32),
+    ("contact_person", "Контакт", 24),
+    ("phone", "Телефон", 20),
+    ("recommendation", "Рекомендуемые действия", 50),
+    ("priority", "Приоритет", 12),
+    ("source_link", "Источник", 35),
+]
+TECH_COLUMNS = [
+    ("project_name", "Направление / Проект", 35),
+    ("fact", "Факт / Событие", 45),
+    ("impact", "Влияние на бизнес / CLC", 45),
+    ("action", "Действие", 40),
+]
+
 COMMENT_FIELDS = [
     ("project_name", "Объект"),
     ("object_type", "Тип объекта"),
@@ -183,16 +208,11 @@ LEGAL_FORMS = {
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
-# --------------------------------------------------------------------------
-# Общие вспомогательные функции
-# --------------------------------------------------------------------------
 def is_set(value: Optional[str]) -> bool:
-    """Возвращает True, если значение заполнено и не равно заглушке."""
     return bool(value) and value != NOT_SET
 
 
 def as_text(value: Any) -> str:
-    """Приводит значение к непустой строке или к заглушке NOT_SET."""
     if value is None:
         return NOT_SET
     text = str(value).strip()
@@ -200,7 +220,6 @@ def as_text(value: Any) -> str:
 
 
 def as_list(value: Any) -> list:
-    """Возвращает значение, если это список, иначе пустой список."""
     return value if isinstance(value, list) else []
 
 
@@ -213,7 +232,6 @@ def digits(value: str) -> str:
 
 
 def split_values(value: str) -> list[str]:
-    """Делит строку с несколькими телефонами/email на отдельные значения."""
     return [part.strip() for part in re.split(r"[;,\n]+", value) if part.strip()]
 
 
@@ -224,14 +242,12 @@ def website_host(value: str) -> str:
 
 
 def normalize_name(value: str) -> str:
-    """Название организации без кавычек и организационно-правовой формы."""
     text = value.lower().replace("ё", "е")
     text = re.sub(r"[«»\"'“”„().,;:–—-]", " ", text)
     return " ".join(word for word in text.split() if word not in LEGAL_FORMS)
 
 
 def lead_fingerprint(lead: dict) -> str:
-    """Устойчивый ключ «заказчик + объект» для защиты от повторной обработки."""
     owner = (
         lead["bin"] if is_set(lead["bin"]) else normalize_name(lead["company_name"])
     )
@@ -249,18 +265,15 @@ def load_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-# --------------------------------------------------------------------------
-# Статистика запуска и состояние
-# --------------------------------------------------------------------------
 @dataclass
 class RunStats:
-    found: int = 0           # сколько компаний/объектов вернула модель
-    matched: int = 0         # сколько из них прошли проверку и соответствуют критериям
-    created: int = 0         # создано лидов
-    flagged: int = 0         # из созданных - с пометкой «проверить дубль»
-    duplicates: int = 0      # исключено дублей (лид не создавался)
-    updated: int = 0         # из дублей - дополнена существующая карточка
-    unverified_removed: int = 0  # значения, которых нет в тексте источника
+    found: int = 0
+    matched: int = 0
+    created: int = 0
+    flagged: int = 0
+    duplicates: int = 0
+    updated: int = 0
+    unverified_removed: int = 0
     errors: int = 0
     error_details: list = field(default_factory=list)
 
@@ -271,7 +284,6 @@ class RunStats:
 
 
 def load_state() -> dict:
-    """Отпечатки уже обработанных лидов: защита от повторной отправки."""
     try:
         data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -325,152 +337,117 @@ def save_run_report(stats: RunStats, push: bool, dry_run: bool) -> None:
         handle.write(f"[{datetime.now():%H:%M:%S}]\n{text}\n\n")
 
 
-# --------------------------------------------------------------------------
-# Gemini
-# --------------------------------------------------------------------------
-class GeminiAccessError(Exception):
-    """Нет доступа к Gemini API: квота, оплата, права или не задан ключ."""
+class OpenAIAccessError(Exception):
+    """Нет доступа к OpenAI API: квота, оплата, права или не задан ключ."""
 
 
 def is_access_problem(status: int, body: str) -> bool:
-    """429 (квота), 402/403 (оплата, права), 400 FAILED_PRECONDITION (нужна оплата)."""
     if status in (402, 403, 429):
         return True
     lowered = body.lower()
     return status == 400 and ("failed_precondition" in lowered or "billing" in lowered)
 
 
-def call_gemini(
+def call_openai(
     model: str,
     prompt: str,
     system_prompt: Optional[str] = None,
     use_search: bool = False,
     json_mode: bool = False,
-) -> Optional[dict]:
-    """Вызывает Gemini API и возвращает первый вариант ответа (candidate)."""
-    if not GEMINI_API_KEY:
-        raise GeminiAccessError("GEMINI_API_KEY не задан")
-    url = GEMINI_URL.format(model=model)
+) -> Optional[str]:
+    if not OPENAI_API_KEY:
+        raise OpenAIAccessError("OPENAI_API_KEY не задан")
     headers = {
-        "x-goog-api-key": GEMINI_API_KEY,
+        "Authorization": f"Bearer {OPENAI_API_KEY}",
         "Content-Type": "application/json",
     }
-    payload: dict[str, Any] = {
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {"maxOutputTokens": GEMINI_MAX_TOKENS},
-    }
-    if system_prompt:
-        payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
+
     if use_search:
-        payload["tools"] = [{"google_search": {}}]
-    if json_mode:
-        payload["generationConfig"]["responseMimeType"] = "application/json"
+        url = f"{OPENAI_BASE_URL}/responses"
+        payload: dict[str, Any] = {
+            "model": model,
+            "input": prompt,
+            "tools": [{"type": "web_search"}],
+            "max_output_tokens": OPENAI_MAX_TOKENS,
+        }
+        if system_prompt:
+            payload["instructions"] = system_prompt
+        if json_mode:
+            payload["text"] = {"format": {"type": "json_object"}}
+    else:
+        url = f"{OPENAI_BASE_URL}/chat/completions"
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+        payload = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": OPENAI_MAX_TOKENS,
+        }
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
 
     try:
         response = requests.post(
-            url, headers=headers, json=payload, timeout=GEMINI_TIMEOUT
+            url, headers=headers, json=payload, timeout=OPENAI_TIMEOUT
         )
         response.raise_for_status()
-        candidate = response.json()["candidates"][0]
+        data = response.json()
     except requests.HTTPError as exc:
-        if is_access_problem(exc.response.status_code, exc.response.text):
-            raise GeminiAccessError(
-                f"HTTP {exc.response.status_code} для модели {model}"
+        status = exc.response.status_code
+        if is_access_problem(status, exc.response.text):
+            raise OpenAIAccessError(
+                f"HTTP {status} для модели {model}"
             ) from exc
         logger.error(
-            "Gemini returned HTTP %s for model '%s': %s",
-            exc.response.status_code,
+            "OpenAI returned HTTP %s for model '%s': %s",
+            status,
             model,
             exc.response.text[:300],
         )
         return None
     except requests.RequestException as exc:
-        logger.error("Gemini request failed for model '%s': %s", model, exc)
+        logger.error("OpenAI request failed for model '%s': %s", model, exc)
         return None
-    except (KeyError, IndexError, ValueError) as exc:
-        logger.error("Unexpected Gemini response format: %s", exc)
+    except ValueError as exc:
+        logger.error("Unexpected OpenAI response format: %s", exc)
         return None
 
-    if candidate.get("finishReason") == "MAX_TOKENS":
-        logger.warning("Gemini answer was cut off: the token limit was reached")
-    return candidate
+    if use_search:
+        output_text = data.get("output_text")
+        if output_text:
+            return output_text.strip()
+        texts = []
+        for item in data.get("output", []):
+            for content in item.get("content", []):
+                if content.get("type") in ("output_text", "text"):
+                    texts.append(content.get("text", ""))
+        return "".join(texts).strip() or None
 
-
-def candidate_text(candidate: dict) -> str:
-    """Склеивает текстовые части ответа, пропуская служебные части с рассуждениями."""
-    parts = candidate.get("content", {}).get("parts", [])
-    return "".join(
-        part.get("text", "") for part in parts if not part.get("thought")
-    ).strip()
-
-
-def resolve_url(uri: str) -> str:
-    """Google Search отдает ссылки-перенаправления; разворачиваем в прямую ссылку."""
-    if "vertexaisearch.cloud.google.com" not in uri:
-        return uri
     try:
-        with requests.get(uri, allow_redirects=True, timeout=15, stream=True) as resp:
-            return resp.url
-    except requests.RequestException as exc:
-        logger.warning("Could not resolve redirect %s: %s", uri[:80], exc)
-        return uri
-
-
-def grounding_sources(candidate: dict) -> list[str]:
-    """Возвращает прямые ссылки на источники, которые использовал Google Search."""
-    chunks = candidate.get("groundingMetadata", {}).get("groundingChunks", [])
-    sources = []
-    for chunk in chunks:
-        web = chunk.get("web") or {}
-        if web.get("uri"):
-            sources.append(f"{web.get('title', 'источник')}: {resolve_url(web['uri'])}")
-    return list(dict.fromkeys(sources))
+        return data["choices"][0]["message"]["content"].strip()
+    except (KeyError, IndexError, TypeError) as exc:
+        logger.error("Unexpected OpenAI chat response format: %s", exc)
+        return None
 
 
 def render_search_prompt() -> str:
-    """Подставляет критерии из criteria.json в шаблон search_prompt.txt."""
-    template = load_text(SEARCH_PROMPT_FILE)
-    criteria = json.loads(load_text(CRITERIA_FILE))
-
-    def bullets(items: list) -> str:
-        return "\n".join(f"- {item}" for item in items)
-
-    values = {
-        "{today}": date.today().isoformat(),
-        "{days}": str(criteria["days"]),
-        "{max_projects}": str(criteria["max_projects"]),
-        "{regions}": ", ".join(criteria["regions"]),
-        "{object_types}": bullets(criteria["object_types"]),
-        "{work_types}": bullets(criteria["work_types"]),
-        "{keywords}": ", ".join(criteria["keywords"]),
-        "{exclude}": ", ".join(criteria["exclude_keywords"]),
-        "{sources}": bullets(criteria["sources"]),
-    }
-    for placeholder, value in values.items():
-        template = template.replace(placeholder, value)
-    return template
+    return load_text(PROMPT_FILE)
 
 
 def search_projects_text(search_prompt: str) -> Optional[str]:
-    """Первый шаг: Gemini с Google Search ищет проекты и возвращает текст с источниками."""
-    logger.info("Searching the web with model '%s'", SEARCH_MODEL)
-    candidate = call_gemini(SEARCH_MODEL, search_prompt, use_search=True)
-    if candidate is None:
+    logger.info("Searching the web with OpenAI model '%s'", SEARCH_MODEL)
+    text = call_openai(SEARCH_MODEL, search_prompt, use_search=True)
+    if text is None:
         return None
-
-    text = candidate_text(candidate)
     if not text:
-        logger.error("Gemini returned an empty answer for the search step")
+        logger.error("OpenAI returned an empty answer for the search step")
         return None
-
-    sources = grounding_sources(candidate)
-    if sources:
-        text += "\n\nИсточники, найденные поиском:\n" + "\n".join(sources)
     return text
 
 
 def parse_json_object(content: str) -> Optional[dict]:
-    """Достает JSON-объект из ответа модели, даже если вокруг есть лишний текст."""
     start = content.find("{")
     end = content.rfind("}")
     if start == -1 or end <= start:
@@ -482,28 +459,23 @@ def parse_json_object(content: str) -> Optional[dict]:
     return parsed if isinstance(parsed, dict) else None
 
 
-def extract_report_via_gemini(raw_text: str, system_prompt: str) -> Optional[dict]:
-    """Второй шаг: Gemini превращает найденный текст в JSON-отчет по схеме из промпта."""
+def extract_report_via_openai(raw_text: str, system_prompt: str) -> Optional[dict]:
     prompt = (
         "Extract construction leads for CLC Company from the text below and "
         "return the report as a JSON object that follows the schema from the "
         f"system prompt.\n\n{raw_text}"
     )
-    candidate = call_gemini(
+    content = call_openai(
         EXTRACT_MODEL, prompt, system_prompt=system_prompt, json_mode=True
     )
-    if candidate is None:
+    if content is None:
         return None
-
-    report = parse_json_object(candidate_text(candidate))
+    report = parse_json_object(content)
     if report is None:
         logger.error("Model answer does not contain a valid JSON object")
     return report
 
 
-# --------------------------------------------------------------------------
-# Нормализация и проверка данных
-# --------------------------------------------------------------------------
 def clean_bin(value: str) -> str:
     if not is_set(value):
         return NOT_SET
@@ -533,7 +505,6 @@ def clean_website(value: str) -> str:
 
 
 def normalize_lead(raw: dict) -> dict:
-    """Приводит лид к единому виду: все поля есть, значения корректны."""
     lead = {key: as_text(raw.get(key)) for key in LEAD_FIELDS}
 
     lead["priority"] = lead["priority"].upper()
@@ -554,10 +525,6 @@ def normalize_lead(raw: dict) -> dict:
 
 
 def verify_lead(lead: dict, source_text: str, stats: RunStats) -> None:
-    """Удаляет БИН, телефон, email, сайт и ссылку, которых нет в тексте источника.
-
-    ТЗ: система не должна придумывать отсутствующие контактные данные.
-    """
     lowered = source_text.lower()
     only_digits = digits(source_text)
 
@@ -578,13 +545,11 @@ def verify_lead(lead: dict, source_text: str, stats: RunStats) -> None:
 
 
 def normalize_report(raw: dict) -> dict:
-    """Проверяет и нормализует ответ модели."""
     leads = [
         normalize_lead(item)
         for item in as_list(raw.get("leads"))
         if isinstance(item, dict)
     ]
-    # Лид без названия объекта и без заказчика не несёт информации.
     leads = [
         lead
         for lead in leads
@@ -620,7 +585,6 @@ def normalize_report(raw: dict) -> dict:
 
 
 def dedupe_batch(leads: list[dict], stats: RunStats) -> list[dict]:
-    """Убирает повторы внутри одной выгрузки (остаётся лид с высшим приоритетом)."""
     seen: set[str] = set()
     unique = []
     for lead in leads:
@@ -634,9 +598,6 @@ def dedupe_batch(leads: list[dict], stats: RunStats) -> list[dict]:
     return unique
 
 
-# --------------------------------------------------------------------------
-# Excel
-# --------------------------------------------------------------------------
 def put(
     ws: Worksheet,
     row: int,
@@ -645,7 +606,6 @@ def put(
     font: Font = BODY_FONT,
     formula: bool = False,
 ):
-    """Записывает значение в ячейку. Текст, начинающийся с '=', не считается формулой."""
     cell = ws.cell(row=row, column=column, value=value)
     if isinstance(value, str) and value.startswith("=") and not formula:
         cell.data_type = "s"
@@ -655,7 +615,6 @@ def put(
 
 
 def fill_table_sheet(ws: Worksheet, columns: list, rows: list[dict]) -> None:
-    """Заполняет лист таблицей с заголовками, фильтром и закрепленной шапкой."""
     for index, (_, header, width) in enumerate(columns, start=1):
         cell = put(ws, 1, index, header, font=HEADER_FONT)
         cell.fill = HEADER_FILL
@@ -669,7 +628,9 @@ def fill_table_sheet(ws: Worksheet, columns: list, rows: list[dict]) -> None:
                 cell.hyperlink = value
                 cell.font = LINK_FONT
             elif key == "priority":
-                cell.fill = PatternFill("solid", start_color=PRIORITY_COLORS[value])
+                cell.fill = PatternFill(
+                    "solid", start_color=PRIORITY_COLORS.get(value, "E7E6E6")
+                )
 
     last_column = get_column_letter(len(columns))
     ws.freeze_panes = "A2"
@@ -677,19 +638,18 @@ def fill_table_sheet(ws: Worksheet, columns: list, rows: list[dict]) -> None:
 
 
 def to_display_rows(leads: list[dict]) -> list[dict]:
-    """Подставляет русские названия видов работ для Excel."""
     return [
         {**lead, "work_type": WORK_TYPE_LABELS.get(lead["work_type"], NOT_SET)}
         for lead in leads
     ]
 
 
-def write_heading(ws: Worksheet, row: int, text: str) -> int:
+def write_block_heading(ws: Worksheet, row: int, text: str) -> int:
     put(ws, row, 1, text, font=BOLD_FONT)
     return row + 1
 
 
-def write_pair(
+def write_block_pair(
     ws: Worksheet, row: int, label: str, value: Any, formula: bool = False
 ) -> int:
     put(ws, row, 1, label)
@@ -697,11 +657,10 @@ def write_pair(
     return row + 1
 
 
-def write_summary_sheet(ws: Worksheet, report: dict, last_row: int) -> None:
-    """Заполняет лист «Сводка». Счетчики считаются формулами по листу «Новые лиды»."""
+def build_summary_sheet(ws: Worksheet, report: dict, last_row: int) -> None:
     leads = report["leads"]
     summary = report["summary"]
-    sheet_ref = "'Новые лиды'"
+    sheet_ref = "'Проекты'"
 
     def column_range(key: str) -> str:
         letter = get_column_letter(LEAD_FIELDS.index(key) + 1)
@@ -710,100 +669,105 @@ def write_summary_sheet(ws: Worksheet, report: dict, last_row: int) -> None:
     ws.column_dimensions["A"].width = 40
     ws.column_dimensions["B"].width = 90
 
-    put(ws, 1, 1, f"Сводка за {report['report_date']}", font=TITLE_FONT)
+    put(
+        ws,
+        1,
+        1,
+        f"Сводка по строительным проектам CLC — {report['report_date']}",
+        font=TITLE_FONT,
+    )
     row = 3
 
     if not leads:
-        row = write_pair(
-            ws,
-            row,
-            "Примечание",
-            "Достоверных новых лидов в предоставленном тексте не найдено.",
-        )
-        row += 1
+        write_block_pair(ws, row, "Примечание", "Достоверных новых лидов не найдено.")
+        return
 
-    row = write_heading(ws, row, "Общее количество лидов")
-    row = write_pair(
-        ws, row, "Всего", f"=COUNTA({column_range('project_name')})", formula=True
+    row = write_block_heading(ws, row, "Общие показатели")
+    row = write_block_pair(
+        ws,
+        row,
+        "Всего перспективных объектов",
+        f"=COUNTA({column_range('project_name')})",
+        formula=True,
     )
     row += 1
 
-    row = write_heading(ws, row, "Лиды по приоритетам")
+    row = write_block_heading(ws, row, "Распределение по приоритетам")
     for priority in PRIORITY_ORDER:
         formula = f'=COUNTIF({column_range("priority")},"{priority}")'
-        row = write_pair(ws, row, f"Категория {priority}", formula, formula=True)
+        row = write_block_pair(
+            ws, row, f"Приоритет {priority}", formula, formula=True
+        )
     row += 1
 
-    for title, key in (
-        ("Распределение по регионам", "region"),
-        ("Распределение по типам объектов", "object_type"),
-    ):
-        row = write_heading(ws, row, title)
-        for name, _ in Counter(lead[key] for lead in leads).most_common():
-            formula = f"=COUNTIF({column_range(key)},$A{row})"
-            row = write_pair(ws, row, name, formula, formula=True)
-        row += 1
-
-    top_projects = summary["top_projects"] or [
-        lead["project_name"] for lead in leads[:4]
-    ]
-    row = write_heading(ws, row, "Наиболее перспективные объекты")
-    for name in top_projects:
+    row = write_block_heading(ws, row, "Топ-проекты в работе")
+    for name in summary["top_projects"] or [lead["project_name"] for lead in leads[:4]]:
         put(ws, row, 1, name)
         row += 1
     row += 1
 
-    row = write_heading(ws, row, "Первоочередные действия отдела продаж")
-    for number, action in enumerate(summary["priority_actions"], start=1):
-        row = write_pair(ws, row, f"Действие {number}", action)
+    row = write_block_heading(ws, row, "Первоочередные действия отдела продаж")
+    for idx, action in enumerate(summary["priority_actions"], start=1):
+        row = write_block_pair(ws, row, f"Действие {idx}", action)
     row += 1
 
-    row = write_heading(ws, row, "Аналитика по перспективным проектам")
-    for item in summary["analytics"]:
-        put(ws, row, 1, item["project_name"], font=BOLD_FONT)
-        row += 1
-        row = write_pair(ws, row, "Факт", item["fact"])
-        row = write_pair(ws, row, "Влияние на CLC", item["impact"])
-        row = write_pair(ws, row, "Действие", item["action"])
-        row += 1
-
-    row = write_heading(ws, row, "Новость о технологиях, ИИ или автоматизации")
-    write_pair(ws, row, "Новость", summary["tech_news"])
+    row = write_block_heading(ws, row, "Технологический радар / ИИ и автоматизация")
+    write_block_pair(ws, row, "Новость / Тренд", summary["tech_news"])
 
 
 def build_excel(report: dict, path: Path) -> None:
-    """Собирает Excel-файл с четырьмя листами и сохраняет его."""
     leads = report["leads"]
-    repairs = [lead for lead in leads if lead["work_type"] in REPAIR_SHEET_TYPES]
 
     workbook = Workbook()
-    leads_sheet = workbook.active
-    leads_sheet.title = "Новые лиды"
-    repairs_sheet = workbook.create_sheet("Реконструкции и ремонты")
-    summary_sheet = workbook.create_sheet("Сводка")
-    sources_sheet = workbook.create_sheet("Источники")
+    radar_sheet = workbook.active
+    radar_sheet.title = "Радар"
+    fill_table_sheet(radar_sheet, RADAR_COLUMNS, leads)
 
-    fill_table_sheet(leads_sheet, LEAD_COLUMNS, to_display_rows(leads))
-    fill_table_sheet(repairs_sheet, LEAD_COLUMNS, to_display_rows(repairs))
-    write_summary_sheet(summary_sheet, report, last_row=max(len(leads) + 1, 2))
-    fill_table_sheet(sources_sheet, SOURCE_COLUMNS, leads)
+    projects_sheet = workbook.create_sheet("Проекты")
+    fill_table_sheet(projects_sheet, LEAD_COLUMNS, to_display_rows(leads))
+
+    edu_leads = [
+        lead
+        for lead in leads
+        if any(
+            word in lead["object_type"].lower()
+            for word in ("школ", "детск", "больниц", "медиц", "колледж", "универ")
+        )
+        or lead["work_type"] in REPAIR_SHEET_TYPES
+    ]
+    edu_sheet = workbook.create_sheet("Образование и ремонты")
+    fill_table_sheet(edu_sheet, EDUCATION_COLUMNS, edu_leads if edu_leads else leads)
+
+    today_leads = [lead for lead in leads if lead["priority"] == "A"]
+    today_sheet = workbook.create_sheet("Отработать сегодня")
+    fill_table_sheet(today_sheet, TODAY_COLUMNS, today_leads)
+
+    tech_sheet = workbook.create_sheet("Технологии и ИИ")
+    tech_rows = report["summary"].get("analytics", [])
+    if not tech_rows and report["summary"].get("tech_news"):
+        tech_rows = [
+            {
+                "project_name": "Общий тренд",
+                "fact": report["summary"]["tech_news"],
+                "impact": "Автоматизация процессов",
+                "action": "Внедрить в CRM",
+            }
+        ]
+    fill_table_sheet(tech_sheet, TECH_COLUMNS, tech_rows)
+
+    summary_sheet = workbook.create_sheet("Сводка")
+    build_summary_sheet(summary_sheet, report, last_row=max(len(leads) + 1, 2))
 
     workbook.save(path)
 
 
 def save_search_text(text: str) -> None:
-    """Сохраняет текст, найденный поиском, чтобы можно было проверить источники."""
     path = OUTPUT_DIR / f"search_{date.today().isoformat()}.txt"
     path.write_text(text, encoding="utf-8")
     logger.info("Search text saved: %s", path)
 
 
 def save_outputs(report: dict, retry: bool = False) -> Path:
-    """Сохраняет JSON и Excel в папку output и возвращает путь к Excel.
-
-    При повторной обработке (--from-json) JSON не перезаписывается,
-    Excel сохраняется отдельным файлом report_retry_<дата>.xlsx.
-    """
     stamp = report["report_date"]
 
     if not retry:
@@ -820,7 +784,6 @@ def save_outputs(report: dict, retry: bool = False) -> Path:
 
 
 def save_failed(leads: list[dict]) -> None:
-    """Лиды, которые не удалось передать в CRM. Повтор: --from-json <файл>."""
     path = OUTPUT_DIR / f"failed_{date.today().isoformat()}.json"
     path.write_text(
         json.dumps({"leads": leads, "summary": {}}, ensure_ascii=False, indent=2),
@@ -831,15 +794,11 @@ def save_failed(leads: list[dict]) -> None:
     )
 
 
-# --------------------------------------------------------------------------
-# Telegram
-# --------------------------------------------------------------------------
 def telegram_enabled() -> bool:
     return bool(TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID)
 
 
 def telegram_call(method: str, data: dict, files: Optional[dict] = None) -> bool:
-    """Вызывает метод Telegram Bot API. Токен в логи не попадает."""
     url = TELEGRAM_API.format(token=TELEGRAM_BOT_TOKEN, method=method)
     try:
         response = requests.post(url, data=data, files=files, timeout=TELEGRAM_TIMEOUT)
@@ -882,9 +841,9 @@ def format_telegram_summary(stats: RunStats, leads: list[dict]) -> str:
         if lead.get("crm_status") in (CRM_CREATED, CRM_CREATED_REVIEW)
     ]
     if stats.created:
-        lines = [f"✅ CLC: в CRM Bitrix24 добавлено лидов: {stats.created}"]
+        lines = [f" CLC: в CRM Bitrix24 добавлено лидов: {stats.created}"]
     else:
-        lines = ["ℹ️ CLC: новых лидов в CRM не добавлено"]
+        lines = ["ℹCLC: новых лидов в CRM не добавлено"]
     if stats.flagged:
         lines.append(f"Из них с пометкой «проверить дубль»: {stats.flagged}")
 
@@ -896,7 +855,7 @@ def format_telegram_summary(stats: RunStats, leads: list[dict]) -> str:
         duplicates,
     ]
     if stats.errors:
-        lines.append(f"⚠️ Ошибок: {stats.errors}")
+        lines.append(f"Ошибок: {stats.errors}")
         lines += [f"  - {detail}" for detail in stats.error_details[:5]]
 
     if created:
@@ -920,9 +879,8 @@ def notify_telegram(
     excel_path: Optional[Path],
     args: argparse.Namespace,
 ) -> None:
-    """Сводка в Telegram после работы с CRM; Excel - если есть добавленные лиды."""
     if args.dry_run or args.skip_bitrix:
-        return  # CRM не менялась, сообщать не о чем
+        return
     if not telegram_enabled():
         logger.info("Telegram is not configured, notification skipped")
         return
@@ -936,9 +894,6 @@ def notify_telegram(
             logger.info("Telegram Excel sent: %s", excel_path.name)
 
 
-# --------------------------------------------------------------------------
-# Bitrix24
-# --------------------------------------------------------------------------
 class BitrixError(Exception):
     """Ошибка вызова REST API Bitrix24."""
 
@@ -948,7 +903,6 @@ _source_id_cache: Optional[str] = None
 
 
 def call_bitrix(method: str, payload: dict) -> dict[str, Any]:
-    """Вызывает метод REST API Bitrix24. При ошибке бросает BitrixError."""
     global _last_bitrix_call
     url = f"{BITRIX_WEBHOOK_URL.rstrip('/')}/{method}.json"
     last_error = ""
@@ -961,7 +915,7 @@ def call_bitrix(method: str, payload: dict) -> dict[str, Any]:
             response = requests.post(url, json=payload, timeout=BITRIX_TIMEOUT)
         except requests.RequestException as exc:
             _last_bitrix_call = time.monotonic()
-            last_error = type(exc).__name__  # текст ошибки содержит секрет вебхука
+            last_error = type(exc).__name__
             time.sleep(attempt)
             continue
         _last_bitrix_call = time.monotonic()
@@ -1005,11 +959,11 @@ def list_entities(kind: str, filter_fields: dict) -> list[dict]:
 
 @dataclass
 class Match:
-    level: str          # "exact" - точное совпадение, "partial" - частичное
-    kind: str           # lead / company / contact
+    level: str
+    kind: str
     entity_id: str
     title: str
-    same_project: bool  # этот объект уже записан в найденной карточке
+    same_project: bool
     reason: str
 
 
@@ -1032,25 +986,15 @@ def make_match(level: str, kind: str, rows: list[dict], lead: dict, reason: str)
 
 
 def lead_company_part(title: str) -> str:
-    """Из заголовка «[AI-CLC] Заказчик — Объект» берёт название заказчика."""
     for prefix in (REVIEW_PREFIX, TITLE_PREFIX):
         title = title.replace(prefix, "")
     return title.split(" — ")[0].strip()
 
 
 def find_existing(lead: dict) -> Optional[Match]:
-    """Ищет заказчика в CRM среди лидов, компаний и контактов.
-
-    Признаки: БИН, телефон, email, сайт, название организации.
-    Точное совпадение - exact; совпадение только части названия - partial.
-    """
     company, bin_code = lead["company_name"], lead["bin"]
-
-    # 1. БИН: в комментариях лидов и компаний (и в реквизитах, если задано поле).
     if is_set(bin_code):
         for kind in ("lead", "company"):
-            # Bitrix молча игнорирует неподдерживаемый фильтр и отдаёт все записи,
-            # поэтому БИН проверяем в самих найденных карточках.
             rows = [
                 r for r in list_entities(kind, {"%COMMENTS": bin_code})
                 if bin_code in digits(html.unescape(r.get("COMMENTS") or ""))
@@ -1072,7 +1016,6 @@ def find_existing(lead: dict) -> Optional[Match]:
                         "БИН (реквизиты)",
                     )
 
-    # 2. Телефон и email: одним запросом по лидам, контактам и компаниям.
     for kind_name, value in (("PHONE", lead["phone"]), ("EMAIL", lead["email"])):
         if not is_set(value):
             continue
@@ -1090,7 +1033,6 @@ def find_existing(lead: dict) -> Optional[Match]:
                         "телефон" if kind_name == "PHONE" else "email",
                     )
 
-    # 3. Сайт (если фильтр по сайту недоступен на портале - просто пропускаем).
     if is_set(lead["website"]):
         host = website_host(lead["website"])
         try:
@@ -1107,7 +1049,6 @@ def find_existing(lead: dict) -> Optional[Match]:
         except BitrixError as exc:
             logger.warning("Website duplicate check skipped: %s", exc)
 
-    # 4. Название организации.
     core = normalize_name(company) if is_set(company) else ""
     if len(core) >= 4:
         partial: Optional[Match] = None
@@ -1130,7 +1071,6 @@ def find_existing(lead: dict) -> Optional[Match]:
                 partial = make_match("partial", kind, rows, lead, "название (частично)")
         return partial
 
-    # 5. Заказчик неизвестен: ищем тот же объект по заголовку лида.
     if is_set(lead["project_name"]):
         project = lead["project_name"].lower()
         rows = [
@@ -1150,7 +1090,6 @@ def lead_lines(lead: dict) -> list[tuple[str, str]]:
 
 
 def build_comments(lead: dict, review: Optional[Match] = None) -> str:
-    """HTML-комментарий для карточки лида: краткое описание и ссылки на источники."""
     parts = []
     if review:
         parts.append(
@@ -1167,14 +1106,12 @@ def build_comments(lead: dict, review: Optional[Match] = None) -> str:
 
 
 def build_timeline_text(lead: dict) -> str:
-    """Текст комментария для таймлайна существующей карточки (BB-код)."""
     lines = [f"[b]{TITLE_PREFIX} Новая информация, найденная ИИ-поиском[/b]"]
     lines += [f"[b]{label}:[/b] {value}" for label, value in lead_lines(lead)]
     return "\n".join(lines)
 
 
 def get_source_id() -> str:
-    """Код источника лида «ИИ-поиск»: находит в CRM или создаёт."""
     global _source_id_cache
     if BITRIX_SOURCE_ID:
         return BITRIX_SOURCE_ID
@@ -1214,6 +1151,7 @@ def build_lead_fields(lead: dict, review: Optional[Match] = None) -> dict:
     company = lead["company_name"] if is_set(lead["company_name"]) else "Неизвестный заказчик"
     project = lead["project_name"] if is_set(lead["project_name"]) else "Объект СМР"
     prefix = TITLE_PREFIX + (REVIEW_PREFIX if review else "")
+    bin_value = lead.get("bin", "Не установлено")
 
     source_description = SOURCE_NAME
     if is_url(lead["source_link"]):
@@ -1244,8 +1182,10 @@ def build_lead_fields(lead: dict, review: Optional[Match] = None) -> dict:
         ]
     if is_set(lead["website"]):
         fields["WEB"] = [{"VALUE": lead["website"], "VALUE_TYPE": "WORK"}]
-    if BITRIX_BIN_FIELD and is_set(lead["bin"]):
-        fields[BITRIX_BIN_FIELD] = lead["bin"]
+
+    if BITRIX_BIN_FIELD and is_set(bin_value):
+        fields[BITRIX_BIN_FIELD] = bin_value
+
     if BITRIX_ASSIGNED_BY_ID:
         fields["ASSIGNED_BY_ID"] = int(BITRIX_ASSIGNED_BY_ID)
     return fields
@@ -1263,10 +1203,6 @@ def create_lead(lead: dict, review: Optional[Match], dry_run: bool) -> None:
 
 
 def add_info_to_existing(match: Match, lead: dict, dry_run: bool) -> None:
-    """Добавляет новую информацию в таймлайн карточки, ничего не удаляя и не меняя.
-
-    Работает для лидов на любой стадии, а также для компаний и контактов.
-    """
     if dry_run:
         logger.info("[DRY-RUN] Would add info to %s #%s", match.kind, match.entity_id)
         return
@@ -1284,7 +1220,6 @@ def add_info_to_existing(match: Match, lead: dict, dry_run: bool) -> None:
 
 
 def handle_lead(lead: dict, mode: str, dry_run: bool, stats: RunStats) -> str:
-    """Сценарии ТЗ: новая компания / дубль / новая информация / частичное совпадение."""
     label = f"{lead['company_name']} — {lead['project_name']}"
     match = find_existing(lead)
     if match:
@@ -1348,16 +1283,12 @@ def push_leads(leads: list[dict], stats: RunStats, dry_run: bool, mode: str) -> 
         save_failed(failed)
 
 
-# --------------------------------------------------------------------------
-# Запуск
-# --------------------------------------------------------------------------
 def process_report(
     raw_report: dict,
     source_text: Optional[str],
     stats: RunStats,
     args: argparse.Namespace,
 ) -> tuple[dict, Path]:
-    """Возвращает итоговый отчёт и путь к Excel-файлу."""
     stats.found = len(as_list(raw_report.get("leads")))
     report = normalize_report(raw_report)
     if source_text:
@@ -1370,86 +1301,38 @@ def process_report(
     logger.info("Found: %d, matched: %d", stats.found, stats.matched)
 
     retry = bool(args.from_json)
-    excel_path = save_outputs(report, retry=retry)  # сохраняем до CRM на случай сбоя
+    excel_path = save_outputs(report, retry=retry)
 
     if args.skip_bitrix:
         logger.info("Bitrix24 push skipped")
         return report, excel_path
 
     push_leads(report["leads"], stats, args.dry_run, args.duplicates)
-    excel_path = save_outputs(report, retry=retry)  # теперь со статусами лидов в CRM
+    excel_path = save_outputs(report, retry=retry)
     return report, excel_path
 
 
-def load_manual_text(path: Path) -> Optional[str]:
-    """Читает файл, который вы подготовили вручную (news.txt / news.json)."""
-    if not path.exists():
-        return None
-    text = path.read_text(encoding="utf-8").strip()
-    if not text:
-        logger.warning("%s is empty", path.name)
-        return None
-    age_days = (date.today() - date.fromtimestamp(path.stat().st_mtime)).days
-    if age_days >= 1:
-        logger.warning(
-            "%s was last changed %d day(s) ago - make sure it holds today's output",
-            path.name,
-            age_days,
-        )
-    return text
-
-
 def get_source_text(args: argparse.Namespace, stats: RunStats) -> Optional[str]:
-    """Текст с найденными проектами: из Gemini API или, если API недоступен, из news.txt."""
-    if not args.manual:
-        try:
-            text = search_projects_text(render_search_prompt())
-        except GeminiAccessError as exc:
-            logger.warning(
-                "Gemini API недоступен (%s). Переключаюсь на ручной режим: %s",
-                exc,
-                NEWS_TEXT_FILE.name,
-            )
-        else:
-            if text is None:
-                stats.add_error("Поиск не вернул результат (см. лог)")
-                return None
-            save_search_text(text)
-            return text
-
-    text = load_manual_text(NEWS_TEXT_FILE)
+    try:
+        text = search_projects_text(render_search_prompt())
+    except OpenAIAccessError as exc:
+        stats.add_error(f"OpenAI API недоступен: {exc}")
+        return None
     if text is None:
-        stats.add_error(
-            f"Нет доступа к Gemini API, а файл {NEWS_TEXT_FILE.name} пуст или не найден"
-        )
-    else:
-        logger.info("Using manual search text from %s", NEWS_TEXT_FILE.name)
+        stats.add_error("Поиск не вернул результат (см. лог)")
+        return None
+    save_search_text(text)
     return text
 
 
 def get_raw_report(
     source_text: str, system_prompt: str, stats: RunStats
 ) -> Optional[dict]:
-    """JSON-отчёт: из Gemini API или, если API недоступен, из news.json."""
     try:
-        report = extract_report_via_gemini(source_text, system_prompt)
-    except GeminiAccessError as exc:
-        logger.warning(
-            "Gemini API недоступен для извлечения (%s). Ищу готовый %s",
-            exc,
-            NEWS_JSON_FILE.name,
-        )
-        text = load_manual_text(NEWS_JSON_FILE)
-        if text is None:
-            stats.add_error(
-                "Извлечение через API недоступно (квота/оплата). Получите JSON в "
-                f"Google AI Studio с промптом prompt.txt и положите в {NEWS_JSON_FILE.name}"
-            )
-            return None
-        report = parse_json_object(text)
-        if report is None:
-            stats.add_error(f"{NEWS_JSON_FILE.name} не содержит корректный JSON-объект")
-        return report
+        report = extract_report_via_openai(source_text, system_prompt)
+    except OpenAIAccessError as exc:
+        stats.add_error(f"OpenAI API недоступен для извлечения: {exc}")
+        return None
 
     if report is None:
         stats.add_error("Не удалось получить JSON-отчёт от модели (см. лог)")
@@ -1457,7 +1340,6 @@ def get_raw_report(
 
 
 def run_once(args: argparse.Namespace) -> RunStats:
-    """Один полный запуск: поиск, извлечение, проверка, дедубликация, CRM, отчёт."""
     stats = RunStats()
     report: Optional[dict] = None
     excel_path: Optional[Path] = None
@@ -1480,20 +1362,19 @@ def run_once(args: argparse.Namespace) -> RunStats:
             if raw_report is None:
                 return stats
         report, excel_path = process_report(raw_report, source_text, stats, args)
-    except Exception as exc:  # чтобы ночной запуск не падал целиком
+    except Exception as exc:
         logger.exception("Pipeline crashed")
         stats.add_error(f"Неожиданная ошибка: {exc}")
     finally:
         save_run_report(stats, not args.skip_bitrix, args.dry_run)
         try:
             notify_telegram(stats, report, excel_path, args)
-        except Exception as exc:  # уведомление не должно ронять выгрузку
+        except Exception as exc:
             logger.warning("Telegram notification failed: %s", type(exc).__name__)
     return stats
 
 
 def run_daily(at: str, args: argparse.Namespace) -> None:
-    """Запуск раз в сутки в указанное время (локальное время сервера)."""
     hour, minute = (int(part) for part in at.split(":"))
     logger.info("Daily mode: next runs at %s every day", at)
     while True:
@@ -1528,7 +1409,7 @@ def parse_args() -> argparse.Namespace:
         "--from-json",
         type=Path,
         help="Re-process a saved JSON (for example output/failed_<date>.json) "
-        "without calling Gemini. Use it to retry after a technical failure.",
+        "without calling OpenAI. Use it to retry after a technical failure.",
     )
     parser.add_argument(
         "--skip-bitrix",
@@ -1549,14 +1430,9 @@ def parse_args() -> argparse.Namespace:
         "(timeline comment, nothing is deleted); skip: just exclude the duplicate.",
     )
     parser.add_argument(
-        "--manual",
-        action="store_true",
-        help="Do not call the Gemini search; take the search text from news.txt.",
-    )
-    parser.add_argument(
         "--print-search-prompt",
         action="store_true",
-        help="Print today's search prompt (to paste into Google AI Studio) and exit.",
+        help="Print the prompt.txt search prompt and exit.",
     )
     parser.add_argument(
         "--test-telegram",
@@ -1581,7 +1457,7 @@ def main() -> None:
     if args.test_telegram:
         if not telegram_enabled():
             sys.exit("TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set in .env")
-        ok = send_telegram_message("✅ CLC: бот подключён, уведомления будут приходить сюда.")
+        ok = send_telegram_message(" CLC: бот подключён, уведомления будут приходить сюда.")
         sys.exit(0 if ok else 1)
     if not args.skip_bitrix and not BITRIX_WEBHOOK_URL:
         sys.exit("BITRIX_WEBHOOK_URL is missing in .env (or use --skip-bitrix)")

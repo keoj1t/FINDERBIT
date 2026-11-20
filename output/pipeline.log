@@ -107,3 +107,278 @@
 Ошибок при поиске или передаче данных: 0
 2026-11-11 13:26:37,229 [INFO] Telegram summary sent
 2026-11-11 13:26:37,709 [INFO] Telegram Excel sent: report_2026-11-11.xlsx
+2026-11-11 15:03:20,725 [INFO] Starting pipeline
+2026-11-11 15:03:20,725 [INFO] Using manual search text from news.txt
+2026-11-11 15:03:31,478 [ERROR] Gemini returned HTTP 503 for model 'gemini-3.1-flash-lite': {
+  "error": {
+    "code": 503,
+    "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+    "status": "UNAVAILABLE"
+  }
+}
+
+2026-11-11 15:03:31,482 [ERROR] Не удалось получить JSON-отчёт от модели (см. лог)
+2026-11-11 15:03:31,482 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 1
+  - Не удалось получить JSON-отчёт от модели (см. лог)
+2026-11-11 15:03:32,042 [INFO] Telegram summary sent
+2026-11-11 15:04:39,978 [INFO] Starting pipeline
+2026-11-11 15:04:39,978 [INFO] Using manual search text from news.txt
+2026-11-11 15:04:53,395 [INFO] Found: 2, matched: 2
+2026-11-11 15:04:53,396 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 15:04:53,406 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 15:05:04,731 [INFO] Lead created in Bitrix24, ID: 30
+2026-11-11 15:05:05,749 [INFO] Match for 'ТОО «Строительная компания «Самрук» — Внутренние отделочные работы п49 ЖК «Нурлы Дала»': exact, причина: БИН, lead #30 «[AI-CLC] ТОО «Строительная компания «Самрук» — Внутренние отделочные работы п.31 ЖК «Ауэзов Сити»», тот же объект: False
+2026-11-11 15:05:06,844 [INFO] New info added to lead #30
+2026-11-11 15:05:06,845 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 15:05:06,850 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 15:05:06,850 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 2
+Соответствуют критериям: 2
+Создано лидов: 1
+Исключено дублей: 1 (в существующие карточки добавлена новая информация: 1)
+Ошибок при поиске или передаче данных: 0
+2026-11-11 15:05:07,787 [INFO] Telegram summary sent
+2026-11-11 15:05:08,882 [INFO] Telegram Excel sent: report_2026-11-11.xlsx
+2026-11-11 17:45:10,173 [INFO] Starting pipeline
+2026-11-11 17:45:10,173 [INFO] Using manual search text from news.txt
+2026-11-11 17:45:17,486 [INFO] Found: 3, matched: 3
+2026-11-11 17:45:17,487 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 17:45:17,504 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 17:45:17,505 [INFO] Skipped, already processed on 2026-11-11: ТОО «Строительная компания «Самрук» — Внутренние отделочные работы п.31 ЖК «Ауэзов Сити»
+2026-11-11 17:45:17,505 [INFO] Skipped, already processed on 2026-11-11: ТОО «Строительная компания «Самрук» — Внутренние отделочные работы п49 ЖК «Нурлы Дала»
+2026-11-11 17:45:20,375 [INFO] Match for 'АО «Центр цифрового развития Национального Банка Казахстана» — Строительство «под ключ» Центра Обработки Данных (г. Алматы, Есентай)': exact, причина: название, lead #2 «[AI-CLC] АО «Центр цифрового развития Национального Банка Казахстана» — Строительство «под ключ» Центра Обработки Данных (г. Алматы, Есентай)», тот же объект: True
+2026-11-11 17:45:20,379 [INFO] Duplicate excluded: АО «Центр цифрового развития Национального Банка Казахстана» — Строительство «под ключ» Центра Обработки Данных (г. Алматы, Есентай) (название, lead #2)
+2026-11-11 17:45:20,382 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 17:45:20,402 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 17:45:20,402 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 3
+Соответствуют критериям: 3
+Создано лидов: 0
+Исключено дублей: 3
+Ошибок при поиске или передаче данных: 0
+2026-11-11 17:45:20,736 [INFO] Telegram summary sent
+2026-11-11 17:53:23,777 [INFO] Starting pipeline
+2026-11-11 17:53:23,777 [INFO] Using manual search text from news.txt
+2026-11-11 17:53:44,012 [INFO] Found: 3, matched: 3
+2026-11-11 17:53:44,013 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 17:53:44,034 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 17:53:51,917 [INFO] Lead created in Bitrix24, ID: 32
+2026-11-11 17:53:57,892 [INFO] Lead created in Bitrix24, ID: 34
+2026-11-11 17:54:01,287 [INFO] Match for 'ГУ «Махамбетский районный отдел экономики и финансов» — Капитальный ремонт 3-х этажного административного здания': exact, причина: сайт, lead #34 «[AI-CLC] КГП на ПХВ «Кызылкогинская районная больница» — Капитальный ремонт районной больницы в с. Миялы Кызылкогинского района», тот же объект: True
+2026-11-11 17:54:01,287 [INFO] Duplicate excluded: ГУ «Махамбетский районный отдел экономики и финансов» — Капитальный ремонт 3-х этажного административного здания (сайт, lead #34)
+2026-11-11 17:54:01,288 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 17:54:01,316 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 17:54:01,317 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 3
+Соответствуют критериям: 3
+Создано лидов: 2
+Исключено дублей: 1
+Ошибок при поиске или передаче данных: 0
+2026-11-11 17:54:01,649 [INFO] Telegram summary sent
+2026-11-11 17:54:02,109 [INFO] Telegram Excel sent: report_2026-11-11.xlsx
+2026-11-11 18:06:43,657 [INFO] Starting pipeline
+2026-11-11 18:06:43,658 [INFO] Using manual search text from news.txt
+2026-11-11 18:06:50,319 [INFO] Found: 3, matched: 3
+2026-11-11 18:06:50,320 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 18:06:50,341 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 18:06:50,562 [INFO] Match for 'КГП на праве хозяйственного ведения «Кызылкогинская районная больница» — Капитальный ремонт районной больницы в с. Миялы': exact, причина: БИН, lead #34 «[AI-CLC] КГП на ПХВ «Кызылкогинская районная больница» — Капитальный ремонт районной больницы в с. Миялы Кызылкогинского района», тот же объект: True
+2026-11-11 18:06:50,562 [INFO] Duplicate excluded: КГП на праве хозяйственного ведения «Кызылкогинская районная больница» — Капитальный ремонт районной больницы в с. Миялы (БИН, lead #34)
+2026-11-11 18:06:50,563 [INFO] Skipped, already processed on 2026-11-11: ГКП «Городская многопрофильная больница №1» — Капитальный ремонт здания по объекту ГКП «Городская многопрофильная больница №1»
+2026-11-11 18:06:50,563 [INFO] Skipped, already processed on 2026-11-11: ГУ "Махамбетский районный отдел экономики и финансов" — Капитальный ремонт 3-х этажного административного здания
+2026-11-11 18:06:50,563 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 18:06:50,612 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 18:06:50,612 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 3
+Соответствуют критериям: 3
+Создано лидов: 0
+Исключено дублей: 3
+Ошибок при поиске или передаче данных: 0
+2026-11-11 18:06:50,998 [INFO] Telegram summary sent
+2026-11-11 18:13:06,662 [INFO] Starting pipeline
+2026-11-11 18:13:06,663 [INFO] Using manual search text from news.txt
+2026-11-11 18:13:15,005 [INFO] Found: 5, matched: 5
+2026-11-11 18:13:15,006 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 18:13:15,028 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 18:13:15,409 [INFO] Match for 'ТОО «Строительная компания «Самрук» — ЖК «Ауэзов Сити» (пятна 31 и 32)': exact, причина: БИН, lead #30 «[AI-CLC] ТОО «Строительная компания «Самрук» — Внутренние отделочные работы п.31 ЖК «Ауэзов Сити»», тот же объект: False
+2026-11-11 18:13:16,228 [INFO] New info added to lead #30
+2026-11-11 18:13:16,888 [INFO] Match for 'ТОО «Строительная компания «Самрук» — ЖК «Нурлы Дала» (пятна 49 и 50)': exact, причина: БИН, lead #30 «[AI-CLC] ТОО «Строительная компания «Самрук» — Внутренние отделочные работы п.31 ЖК «Ауэзов Сити»», тот же объект: False
+2026-11-11 18:13:17,562 [INFO] New info added to lead #30
+2026-11-11 18:13:24,828 [INFO] Lead created in Bitrix24, ID: 36
+2026-11-11 18:13:30,212 [INFO] Lead created in Bitrix24, ID: 38
+2026-11-11 18:13:34,150 [INFO] Lead created in Bitrix24, ID: 40
+2026-11-11 18:13:34,151 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-11.json
+2026-11-11 18:13:34,178 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-11.xlsx
+2026-11-11 18:13:34,178 [INFO] 
+Отчёт о выгрузке за 2026-11-11
+Найдено компаний/объектов: 5
+Соответствуют критериям: 5
+Создано лидов: 3
+Исключено дублей: 2 (в существующие карточки добавлена новая информация: 2)
+Ошибок при поиске или передаче данных: 0
+2026-11-11 18:13:34,503 [INFO] Telegram summary sent
+2026-11-11 18:13:34,993 [INFO] Telegram Excel sent: report_2026-11-11.xlsx
+2026-11-20 13:50:48,219 [INFO] Starting pipeline
+2026-11-20 13:50:48,219 [ERROR] Pipeline crashed
+Traceback (most recent call last):
+  File "/Users/aruzanbatalova/Desktop/FINDERBIT/main.py", line 1426, in run_once
+    source_text = get_source_text(args, stats)
+  File "/Users/aruzanbatalova/Desktop/FINDERBIT/main.py", line 1358, in get_source_text
+    text = search_projects_text(render_search_prompt())
+                                ~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/aruzanbatalova/Desktop/FINDERBIT/main.py", line 442, in render_search_prompt
+    template = load_text(SEARCH_PROMPT_FILE)
+  File "/Users/aruzanbatalova/Desktop/FINDERBIT/main.py", line 268, in load_text
+    raise FileNotFoundError(f"File not found: {path}")
+FileNotFoundError: File not found: /Users/aruzanbatalova/Desktop/FINDERBIT/search_prompt.txt
+2026-11-20 13:50:48,225 [ERROR] Неожиданная ошибка: File not found: /Users/aruzanbatalova/Desktop/FINDERBIT/search_prompt.txt
+2026-11-20 13:50:48,225 [INFO] 
+Отчёт о выгрузке за 2026-11-20
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 1
+  - Неожиданная ошибка: File not found: /Users/aruzanbatalova/Desktop/FINDERBIT/search_prompt.txt
+2026-11-20 13:50:48,604 [INFO] Telegram summary sent
+2026-11-20 13:51:57,983 [WARNING] search_prompt.txt is missing; using prompt.txt as the search instruction
+2026-11-20 13:54:03,417 [INFO] Starting pipeline
+2026-11-20 13:54:03,418 [INFO] Searching the web with OpenAI model 'gpt-4o-mini'
+2026-11-20 13:54:13,921 [WARNING] OpenAI API недоступен (HTTP 429 для модели gpt-4o-mini). Переключаюсь на ручной режим: news.txt
+2026-11-20 13:54:13,925 [ERROR] Нет доступа к OpenAI API, а файл news.txt пуст или не найден
+2026-11-20 13:54:13,926 [INFO] 
+Отчёт о выгрузке за 2026-11-20
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 1
+  - Нет доступа к OpenAI API, а файл news.txt пуст или не найден
+2026-11-20 13:54:14,230 [INFO] Telegram summary sent
+2026-11-20 13:56:46,143 [INFO] Starting pipeline
+2026-11-20 13:56:46,144 [INFO] Searching the web with OpenAI model 'gpt-4o-mini'
+2026-11-20 13:56:51,916 [ERROR] OpenAI API недоступен: HTTP 429 для модели gpt-4o-mini
+2026-11-20 13:56:51,920 [INFO] 
+Отчёт о выгрузке за 2026-11-20
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 1
+  - OpenAI API недоступен: HTTP 429 для модели gpt-4o-mini
+2026-11-20 13:56:52,265 [INFO] Telegram summary sent
+2026-11-20 14:38:38,917 [INFO] Starting pipeline
+2026-11-20 14:38:38,917 [INFO] Searching the web with OpenAI model 'gpt-4o-mini'
+2026-11-20 14:38:43,417 [INFO] Search text saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/search_2026-11-20.txt
+2026-11-20 14:38:46,131 [INFO] Found: 0, matched: 0
+2026-11-20 14:38:46,132 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-20.json
+2026-11-20 14:38:46,149 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-20.xlsx
+2026-11-20 14:38:46,150 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-20.json
+2026-11-20 14:38:46,160 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-20.xlsx
+2026-11-20 14:38:46,160 [INFO] 
+Отчёт о выгрузке за 2026-11-20
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 0
+2026-11-20 14:38:46,607 [INFO] Telegram summary sent
+2026-11-20 14:41:38,243 [INFO] Starting pipeline
+2026-11-20 14:41:38,243 [INFO] Searching the web with OpenAI model 'gpt-4o-search-preview'
+2026-11-20 14:41:40,563 [ERROR] OpenAI returned HTTP 400 for model 'gpt-4o-search-preview': {
+  "error": {
+    "message": "The requested model 'gpt-4o-search-preview' is not supported with the Responses API.",
+    "type": "invalid_request_error",
+    "param": "model",
+    "code": "model_not_found"
+  }
+}
+2026-11-20 14:41:40,565 [ERROR] Поиск не вернул результат (см. лог)
+2026-11-20 14:41:40,565 [INFO] 
+Отчёт о выгрузке за 2026-11-20
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 1
+  - Поиск не вернул результат (см. лог)
+2026-11-20 14:41:40,907 [INFO] Telegram summary sent
+2026-11-20 14:45:45,885 [INFO] Starting pipeline
+2026-11-20 14:45:45,885 [INFO] Searching the web with OpenAI model 'gpt-4o-mini'
+2026-11-20 14:45:48,929 [INFO] Search text saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/search_2026-11-20.txt
+2026-11-20 14:45:50,118 [ERROR] OpenAI returned HTTP 404 for model 'gpt-4o-search-preview': {
+    "error": {
+        "message": "The model `gpt-4o-search-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations",
+        "type": "invalid_request_error",
+        "param": null,
+        "code": "model_not_found"
+    }
+}
+
+2026-11-20 14:45:50,118 [ERROR] Не удалось получить JSON-отчёт от модели (см. лог)
+2026-11-20 14:45:50,119 [INFO] 
+Отчёт о выгрузке за 2026-11-20
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 1
+  - Не удалось получить JSON-отчёт от модели (см. лог)
+2026-11-20 14:45:50,444 [INFO] Telegram summary sent
+2026-11-20 14:46:12,665 [INFO] Starting pipeline
+2026-11-20 14:46:12,665 [INFO] Searching the web with OpenAI model 'gpt-4o-mini'
+2026-11-20 14:46:15,097 [INFO] Search text saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/search_2026-11-20.txt
+2026-11-20 14:46:17,109 [INFO] Found: 0, matched: 0
+2026-11-20 14:46:17,110 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-20.json
+2026-11-20 14:46:17,127 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-20.xlsx
+2026-11-20 14:46:17,128 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-20.json
+2026-11-20 14:46:17,140 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-20.xlsx
+2026-11-20 14:46:17,140 [INFO] 
+Отчёт о выгрузке за 2026-11-20
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 0
+2026-11-20 14:46:17,455 [INFO] Telegram summary sent
+2026-11-20 14:50:34,939 [INFO] Starting pipeline
+2026-11-20 14:50:34,940 [INFO] Searching the web with OpenAI model 'gpt-4o'
+2026-11-20 14:50:40,576 [INFO] Search text saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/search_2026-11-20.txt
+2026-11-20 14:50:47,037 [INFO] Found: 1, matched: 1
+2026-11-20 14:50:47,037 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-20.json
+2026-11-20 14:50:47,050 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-20.xlsx
+2026-11-20 14:50:53,152 [INFO] [DRY-RUN] Would create lead: ТОО Almaty Buildings — Строительство нового бизнес-центра
+2026-11-20 14:50:53,154 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-20.json
+2026-11-20 14:50:53,175 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-20.xlsx
+2026-11-20 14:50:53,175 [INFO] 
+Отчёт о выгрузке за 2026-11-20 (тестовый режим: CRM не изменялась)
+Найдено компаний/объектов: 1
+Соответствуют критериям: 1
+Создано лидов: 1
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 0
+2026-11-20 14:52:47,697 [INFO] Starting pipeline
+2026-11-20 14:52:47,698 [INFO] Searching the web with OpenAI model 'gpt-4o'
+2026-11-20 14:52:50,987 [INFO] Search text saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/search_2026-11-20.txt
+2026-11-20 14:52:52,685 [INFO] Found: 0, matched: 0
+2026-11-20 14:52:52,686 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-20.json
+2026-11-20 14:52:52,703 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-20.xlsx
+2026-11-20 14:52:52,703 [INFO] JSON saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/leads_2026-11-20.json
+2026-11-20 14:52:52,714 [INFO] Excel saved: /Users/aruzanbatalova/Desktop/FINDERBIT/output/report_2026-11-20.xlsx
+2026-11-20 14:52:52,714 [INFO] 
+Отчёт о выгрузке за 2026-11-20
+Найдено компаний/объектов: 0
+Соответствуют критериям: 0
+Создано лидов: 0
+Исключено дублей: 0
+Ошибок при поиске или передаче данных: 0
+2026-11-20 14:52:53,135 [INFO] Telegram summary sent
