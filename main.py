@@ -24,6 +24,8 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
 PROMPT_FILE = BASE_DIR / "prompt.txt"
+SEARCH_PROMPT_FILE = BASE_DIR / "Search prompt.txt"
+CRITERIA_FILE = BASE_DIR / "criteria.json"
 OUTPUT_DIR = BASE_DIR / "output"
 STATE_FILE = OUTPUT_DIR / "state.json"
 
@@ -367,7 +369,13 @@ def call_openai(
         payload: dict[str, Any] = {
             "model": model,
             "input": prompt,
-            "tools": [{"type": "web_search"}],
+            "tools": [
+                {
+                    "type": "web_search",
+                    "search_context_size": "high",
+                    "user_location": {"type": "approximate", "country": "KZ"},
+                }
+            ],
             "max_output_tokens": OPENAI_MAX_TOKENS,
         }
         if system_prompt:
@@ -432,8 +440,70 @@ def call_openai(
         return None
 
 
+def load_criteria() -> dict:
+    try:
+        data = json.loads(load_text(CRITERIA_FILE))
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+EXTRA_FOCUS = [
+    (
+        "Закупки нацкомпаний и квазигоссектора",
+        "Закупки и тендеры национальных компаний и квазигосударственного сектора "
+        "(Самрук-Казына, Байтерек, КТЖ, КазМунайГаз, Казатомпром и их дочерние "
+        "организации) на ремонт, реконструкцию и отделку зданий по всему Казахстану.",
+    ),
+    (
+        "Тендеры на отделочные работы",
+        "Тендеры и запросы ценовых предложений именно на отделочные работы, "
+        "напольные покрытия, линолеум, подвесные потолки, стеновые панели и акустику "
+        "по всему Казахстану (goszakup.gov.kz, omarket.kz, tendercom.kz, mytender.kz, "
+        "smarttender.kz и аналогичные площадки).",
+    ),
+]
+
+
+def build_search_jobs() -> list[tuple[str, str]]:
+    criteria = load_criteria()
+    days = int(criteria.get("days", 14))
+    max_projects = int(criteria.get("max_projects", 10))
+    today = date.today()
+    since = today - timedelta(days=days)
+    template = load_text(SEARCH_PROMPT_FILE)
+
+    def join(key: str) -> str:
+        return "; ".join(criteria.get(key, []))
+
+    common = {
+        "<<TODAY>>": today.isoformat(),
+        "<<SINCE>>": since.isoformat(),
+        "<<DAYS>>": str(days),
+        "<<MAX>>": str(max_projects),
+        "<<OBJECT_TYPES>>": join("object_types"),
+        "<<WORK_TYPES>>": join("work_types"),
+        "<<KEYWORDS>>": join("keywords"),
+        "<<EXCLUDE>>": join("exclude_keywords"),
+        "<<SOURCES>>": join("sources"),
+    }
+
+    focuses = [
+        (f"Регион: {region}", f"Регион поиска: {region}.")
+        for region in (criteria.get("regions") or ["весь Казахстан"])
+    ] + EXTRA_FOCUS
+
+    jobs = []
+    for name, focus in focuses:
+        prompt = template.replace("<<FOCUS>>", focus)
+        for token, value in common.items():
+            prompt = prompt.replace(token, value)
+        jobs.append((name, prompt))
+    return jobs
+
+
 def render_search_prompt() -> str:
-    return load_text(PROMPT_FILE)
+    return "\n\n=====\n\n".join(prompt for _, prompt in build_search_jobs())
 
 
 def search_projects_text(search_prompt: str) -> Optional[str]:
@@ -461,6 +531,7 @@ def parse_json_object(content: str) -> Optional[dict]:
 
 def extract_report_via_openai(raw_text: str, system_prompt: str) -> Optional[dict]:
     prompt = (
+        f"Today is {date.today().isoformat()}. "
         "Extract construction leads for CLC Company from the text below and "
         "return the report as a JSON object that follows the schema from the "
         f"system prompt.\n\n{raw_text}"
@@ -761,8 +832,9 @@ def build_excel(report: dict, path: Path) -> None:
     workbook.save(path)
 
 
-def save_search_text(text: str) -> None:
-    path = OUTPUT_DIR / f"search_{date.today().isoformat()}.txt"
+def save_search_text(text: str, name: str = "all") -> None:
+    safe = re.sub(r"[^\w-]+", "_", name, flags=re.UNICODE).strip("_")[:40] or "all"
+    path = OUTPUT_DIR / f"search_{date.today().isoformat()}_{datetime.now():%H%M%S}_{safe}.txt"
     path.write_text(text, encoding="utf-8")
     logger.info("Search text saved: %s", path)
 
@@ -1312,17 +1384,41 @@ def process_report(
     return report, excel_path
 
 
-def get_source_text(args: argparse.Namespace, stats: RunStats) -> Optional[str]:
-    try:
-        text = search_projects_text(render_search_prompt())
-    except OpenAIAccessError as exc:
-        stats.add_error(f"OpenAI API недоступен: {exc}")
-        return None
-    if text is None:
+def get_source_texts(stats: RunStats) -> list[str]:
+    texts: list[str] = []
+    jobs = build_search_jobs()
+    for number, (name, prompt) in enumerate(jobs, start=1):
+        logger.info("Search %d/%d: %s", number, len(jobs), name)
+        try:
+            text = search_projects_text(prompt)
+        except OpenAIAccessError as exc:
+            stats.add_error(f"OpenAI API недоступен: {exc}")
+            break
+        if text is None:
+            logger.warning("Search '%s' returned nothing", name)
+            continue
+        save_search_text(text, name)
+        texts.append(text)
+    if not texts:
         stats.add_error("Поиск не вернул результат (см. лог)")
-        return None
-    save_search_text(text)
-    return text
+    return texts
+
+
+def merge_reports(reports: list[dict]) -> dict:
+    merged: dict[str, Any] = {"leads": [], "summary": {
+        "top_projects": [], "analytics": [], "priority_actions": [],
+        "tech_news": NOT_SET,
+    }}
+    for report in reports:
+        merged["leads"] += [x for x in as_list(report.get("leads")) if isinstance(x, dict)]
+        summary = report.get("summary")
+        if not isinstance(summary, dict):
+            continue
+        for key in ("top_projects", "analytics", "priority_actions"):
+            merged["summary"][key] += as_list(summary.get(key))
+        if merged["summary"]["tech_news"] == NOT_SET and is_set(as_text(summary.get("tech_news"))):
+            merged["summary"]["tech_news"] = as_text(summary.get("tech_news"))
+    return merged
 
 
 def get_raw_report(
@@ -1353,14 +1449,20 @@ def run_once(args: argparse.Namespace) -> RunStats:
         else:
             system_prompt = load_text(PROMPT_FILE)
             if args.input:
-                source_text = load_text(args.input)
+                texts = [load_text(args.input)]
             else:
-                source_text = get_source_text(args, stats)
-                if source_text is None:
+                texts = get_source_texts(stats)
+                if not texts:
                     return stats
-            raw_report = get_raw_report(source_text, system_prompt, stats)
-            if raw_report is None:
+            source_text = "\n\n".join(texts)
+            raw_reports = []
+            for chunk in texts:
+                part = get_raw_report(chunk, system_prompt, stats)
+                if part is not None:
+                    raw_reports.append(part)
+            if not raw_reports:
                 return stats
+            raw_report = merge_reports(raw_reports)
         report, excel_path = process_report(raw_report, source_text, stats, args)
     except Exception as exc:
         logger.exception("Pipeline crashed")
