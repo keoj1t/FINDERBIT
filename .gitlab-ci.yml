@@ -1,0 +1,36 @@
+# Configure under Build > Pipeline schedules: 0 23 * * * in Asia/Almaty.
+# If timezone selection is unavailable, use 0 18 * * * in UTC.
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - when: never
+
+stages:
+  - search
+
+daily-search:
+  stage: search
+  image: python:3.12-slim
+  cache:
+    key: "lead-state-${CI_COMMIT_REF_SLUG}"
+    paths:
+      - output/state.json
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+  before_script:
+    - pip install --disable-pip-version-check --no-cache-dir -r requirements.txt
+  script:
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "schedule" ]; then
+        python main.py
+      else
+        python main.py --dry-run
+      fi
+  artifacts:
+    when: always
+    paths:
+      - output/
+    expire_in: 14 days
