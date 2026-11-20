@@ -118,7 +118,9 @@ LEAD_COLUMNS = [
     ("finishing_subcontractor", "Субподрядчик по отделке", 32),
     ("stage", "Стадия", 28),
     ("timeline", "Сроки", 22),
+    ("offer_deadline", "Срок предложения", 22),
     ("budget", "Бюджет", 20),
+    ("project_scale", "Масштаб проекта", 24),
     ("clc_demand", "Потребность в продукции CLC", 40),
     ("contact_person", "Контактное лицо", 24),
     ("phone", "Телефон", 20),
@@ -126,56 +128,91 @@ LEAD_COLUMNS = [
     ("source_link", "Источник", 40),
     ("publication_date", "Дата публикации", 18),
     ("recommendation", "Рекомендуемые действия", 45),
+    ("expected_result", "Ожидаемый результат", 40),
+    ("risk_check", "Риски / что проверить", 45),
     ("priority", "Приоритет", 12),
     ("crm_status", "Статус в CRM", 30),
 ]
 LEAD_FIELDS = [key for key, _, _ in LEAD_COLUMNS]
 ANALYTICS_FIELDS = ("project_name", "fact", "impact", "action")
+TECH_NEWS_FIELDS = (
+    "date",
+    "initiative",
+    "verified_fact",
+    "scale",
+    "clc_connection",
+    "limitation",
+    "action",
+    "source_link",
+)
 
 RADAR_COLUMNS = [
-    ("project_name", "Объект / Наименование", 40),
-    ("city", "Город", 18),
-    ("company_name", "Заказчик / Девелопер", 32),
-    ("bin", "БИН", 16),
-    ("general_contractor", "Генподрядчик", 32),
-    ("stage", "Стадия", 28),
-    ("timeline", "Сроки", 22),
-    ("clc_demand", "Потребность в продукции CLC", 40),
-    ("priority", "Приоритет", 12),
+    ("number", "№", 6),
+    ("publication_date", "Дата", 16),
+    ("signal_type", "Тип", 24),
+    ("project_name", "Сигнал", 40),
+    ("location", "Локация", 25),
+    ("verified_fact", "Проверенный факт", 49),
+    ("clc_demand", "Возможность CLC", 52),
+    ("rating", "Приоритет", 14),
+    ("source_link", "Источник", 44),
+]
+PROJECT_COLUMNS = [
+    ("number", "№", 6),
+    ("project_label", "Проект", 38),
+    ("rating", "Оценка", 13),
+    ("publication_date", "Дата", 15),
+    ("location", "Локация", 25),
+    ("stage", "Стадия", 34),
+    ("scale", "Бюджет / масштаб", 30),
+    ("company_name", "Заказчик / куратор", 34),
+    ("contractor", "Подрядчик / проектировщик", 31),
+    ("clc_demand", "Позиции CLC", 54),
+    ("contact", "Кому обращаться", 35),
+    ("phone", "Телефон", 22),
+    ("email", "Email", 28),
+    ("offer_deadline", "Срок предложения", 20),
+    ("recommendation", "Первый шаг", 45),
+    ("risk_check", "Риски / проверка", 48),
+    ("source_link", "Источник", 44),
 ]
 EDUCATION_COLUMNS = [
-    ("project_name", "Объект", 40),
-    ("city", "Город", 18),
-    ("region", "Регион", 24),
-    ("object_type", "Тип объекта", 24),
-    ("company_name", "Заказчик", 32),
-    ("bin", "БИН", 16),
-    ("general_contractor", "Генподрядчик", 32),
-    ("stage", "Стадия", 28),
-    ("timeline", "Сроки", 22),
-    ("budget", "Бюджет", 20),
-    ("clc_demand", "Потребность в продукции CLC", 40),
-    ("contact_person", "Контакт", 24),
-    ("phone", "Телефон", 20),
-    ("email", "Email", 26),
-    ("source_link", "Источник", 35),
-    ("priority", "Приоритет", 12),
+    ("number", "№", 6),
+    ("project_name", "Объект / программа", 36),
+    ("object_type", "Тип", 24),
+    ("region", "Регион", 22),
+    ("scale", "Масштаб", 24),
+    ("stage", "Стадия", 33),
+    ("current_status", "Актуальный статус", 38),
+    ("company_name", "Заказчик / канал", 34),
+    ("contractor", "Подрядчик / ГИП", 31),
+    ("clc_demand", "Позиции CLC", 52),
+    ("procurement_status", "Закупочный статус", 30),
+    ("recommendation", "Действие", 47),
+    ("rating", "Оценка", 14),
+    ("repair_control", "Контроль ремонта", 30),
+    ("risk_check", "Ограничение", 45),
+    ("source_link", "Источник", 44),
 ]
 TODAY_COLUMNS = [
-    ("project_name", "Объект", 40),
-    ("company_name", "Заказчик", 32),
-    ("general_contractor", "Генподрядчик", 32),
-    ("contact_person", "Контакт", 24),
-    ("phone", "Телефон", 20),
-    ("recommendation", "Рекомендуемые действия", 50),
-    ("priority", "Приоритет", 12),
-    ("source_link", "Источник", 35),
+    ("number", "Приоритет", 10),
+    ("project_label", "Лид", 42),
+    ("responsible", "Ответственный", 31),
+    ("recommendation", "Действие", 59),
+    ("contact", "Контакт", 43),
+    ("offer_deadline", "Дедлайн", 22),
+    ("expected_result", "Ожидаемый результат", 53),
+    ("task_status", "Статус", 18),
 ]
 TECH_COLUMNS = [
-    ("project_name", "Направление / Проект", 35),
-    ("fact", "Факт / Событие", 45),
-    ("impact", "Влияние на бизнес / CLC", 45),
-    ("action", "Действие", 40),
+    ("date", "Дата", 15),
+    ("initiative", "Инициатива", 38),
+    ("verified_fact", "Проверенный факт", 56),
+    ("scale", "Масштаб", 34),
+    ("clc_connection", "Связь с CLC", 52),
+    ("limitation", "Ограничение", 48),
+    ("action", "Действие", 52),
+    ("source_link", "Источник", 44),
 ]
 
 COMMENT_FIELDS = [
@@ -192,7 +229,9 @@ COMMENT_FIELDS = [
     ("finishing_subcontractor", "Субподрядчик по отделке"),
     ("stage", "Стадия"),
     ("timeline", "Сроки"),
+    ("offer_deadline", "Срок предложения"),
     ("budget", "Бюджет"),
+    ("project_scale", "Масштаб проекта"),
     ("clc_demand", "Потребность в продукции CLC"),
     ("contact_person", "Контактное лицо"),
     ("phone", "Телефон"),
@@ -200,6 +239,8 @@ COMMENT_FIELDS = [
     ("publication_date", "Дата публикации"),
     ("priority", "Приоритет"),
     ("recommendation", "Рекомендация CLC"),
+    ("expected_result", "Ожидаемый результат"),
+    ("risk_check", "Риски / что проверить"),
     ("source_link", "Источник"),
 ]
 
@@ -448,24 +489,7 @@ def load_criteria() -> dict:
     return data if isinstance(data, dict) else {}
 
 
-EXTRA_FOCUS = [
-    (
-        "Закупки нацкомпаний и квазигоссектора",
-        "Закупки и тендеры национальных компаний и квазигосударственного сектора "
-        "(Самрук-Казына, Байтерек, КТЖ, КазМунайГаз, Казатомпром и их дочерние "
-        "организации) на ремонт, реконструкцию и отделку зданий по всему Казахстану.",
-    ),
-    (
-        "Тендеры на отделочные работы",
-        "Тендеры и запросы ценовых предложений именно на отделочные работы, "
-        "напольные покрытия, линолеум, подвесные потолки, стеновые панели и акустику "
-        "по всему Казахстану (goszakup.gov.kz, omarket.kz, tendercom.kz, mytender.kz, "
-        "smarttender.kz и аналогичные площадки).",
-    ),
-]
-
-
-def build_search_jobs() -> list[tuple[str, str]]:
+def render_search_prompt() -> str:
     criteria = load_criteria()
     days = int(criteria.get("days", 14))
     max_projects = int(criteria.get("max_projects", 10))
@@ -488,22 +512,17 @@ def build_search_jobs() -> list[tuple[str, str]]:
         "<<SOURCES>>": join("sources"),
     }
 
-    focuses = [
-        (f"Регион: {region}", f"Регион поиска: {region}.")
-        for region in (criteria.get("regions") or ["весь Казахстан"])
-    ] + EXTRA_FOCUS
-
-    jobs = []
-    for name, focus in focuses:
-        prompt = template.replace("<<FOCUS>>", focus)
-        for token, value in common.items():
-            prompt = prompt.replace(token, value)
-        jobs.append((name, prompt))
-    return jobs
-
-
-def render_search_prompt() -> str:
-    return "\n\n=====\n\n".join(prompt for _, prompt in build_search_jobs())
+    regions = "; ".join(criteria.get("regions") or ["весь Казахстан"])
+    focus = (
+        "Один сводный поиск по всему Казахстану, охвати все регионы: "
+        f"{regions}. В первую очередь ищи частных застройщиков, девелоперов, "
+        "владельцев коммерческой недвижимости и другие частные компании. "
+        "Не разбивай поиск на отдельные задания по регионам."
+    )
+    prompt = template.replace("<<FOCUS>>", focus)
+    for token, value in common.items():
+        prompt = prompt.replace(token, value)
+    return prompt
 
 
 def search_projects_text(search_prompt: str) -> Optional[str]:
@@ -637,6 +656,17 @@ def normalize_report(raw: dict) -> dict:
         for item in as_list(raw_summary.get("analytics"))
         if isinstance(item, dict)
     ]
+    raw_technology_news = raw_summary.get("technology_news")
+    if isinstance(raw_technology_news, dict):
+        technology_news = {
+            key: as_text(raw_technology_news.get(key))
+            for key in TECH_NEWS_FIELDS
+        }
+    else:
+        technology_news = {key: NOT_SET for key in TECH_NEWS_FIELDS}
+    tech_news = as_text(raw_summary.get("tech_news"))
+    if not is_set(tech_news) and is_set(technology_news["verified_fact"]):
+        tech_news = technology_news["verified_fact"]
 
     return {
         "report_date": date.today().isoformat(),
@@ -650,7 +680,8 @@ def normalize_report(raw: dict) -> dict:
                 for action in as_list(raw_summary.get("priority_actions"))
             ],
             "analytics": analytics,
-            "tech_news": as_text(raw_summary.get("tech_news")),
+            "tech_news": tech_news,
+            "technology_news": technology_news,
         },
     }
 
@@ -685,27 +716,40 @@ def put(
     return cell
 
 
-def fill_table_sheet(ws: Worksheet, columns: list, rows: list[dict]) -> None:
+def fill_table_sheet(
+    ws: Worksheet, columns: list, rows: list[dict], header_row: int = 1
+) -> None:
     for index, (_, header, width) in enumerate(columns, start=1):
-        cell = put(ws, 1, index, header, font=HEADER_FONT)
+        cell = put(ws, header_row, index, header, font=HEADER_FONT)
         cell.fill = HEADER_FILL
         ws.column_dimensions[get_column_letter(index)].width = width
 
-    for row_index, row in enumerate(rows, start=2):
+    for row_number, row in enumerate(rows, start=1):
+        row_index = header_row + row_number
         for col_index, (key, _, _) in enumerate(columns, start=1):
-            value = row[key]
+            value = row_number if key == "number" else row.get(key, NOT_SET)
             cell = put(ws, row_index, col_index, value)
             if key == "source_link" and is_url(value):
                 cell.hyperlink = value
                 cell.font = LINK_FONT
-            elif key == "priority":
+            elif key in ("priority", "rating"):
+                priority = value
+                if value in ("Горячий", "Теплый", "Тёплый", "Наблюдать"):
+                    priority = {
+                        "Горячий": "A",
+                        "Теплый": "B",
+                        "Тёплый": "B",
+                        "Наблюдать": "C",
+                    }[value]
                 cell.fill = PatternFill(
-                    "solid", start_color=PRIORITY_COLORS.get(value, "E7E6E6")
+                    "solid", start_color=PRIORITY_COLORS.get(priority, "E7E6E6")
                 )
 
     last_column = get_column_letter(len(columns))
-    ws.freeze_panes = "A2"
-    ws.auto_filter.ref = f"A1:{last_column}{max(len(rows) + 1, 2)}"
+    ws.freeze_panes = f"A{header_row + 1}"
+    ws.auto_filter.ref = (
+        f"A{header_row}:{last_column}{max(header_row + len(rows), header_row + 1)}"
+    )
 
 
 def to_display_rows(leads: list[dict]) -> list[dict]:
@@ -715,119 +759,344 @@ def to_display_rows(leads: list[dict]) -> list[dict]:
     ]
 
 
-def write_block_heading(ws: Worksheet, row: int, text: str) -> int:
-    put(ws, row, 1, text, font=BOLD_FONT)
-    return row + 1
-
-
-def write_block_pair(
-    ws: Worksheet, row: int, label: str, value: Any, formula: bool = False
-) -> int:
-    put(ws, row, 1, label)
-    put(ws, row, 2, value, formula=formula)
-    return row + 1
-
-
-def build_summary_sheet(ws: Worksheet, report: dict, last_row: int) -> None:
-    leads = report["leads"]
-    summary = report["summary"]
-    sheet_ref = "'Проекты'"
-
-    def column_range(key: str) -> str:
-        letter = get_column_letter(LEAD_FIELDS.index(key) + 1)
-        return f"{sheet_ref}!${letter}$2:${letter}${last_row}"
-
-    ws.column_dimensions["A"].width = 40
-    ws.column_dimensions["B"].width = 90
-
-    put(
-        ws,
-        1,
-        1,
-        f"Сводка по строительным проектам CLC — {report['report_date']}",
-        font=TITLE_FONT,
+def rating_label(priority: str) -> str:
+    return {"A": "Горячий", "B": "Теплый", "C": "Наблюдать"}.get(
+        priority, NOT_SET
     )
-    row = 3
 
-    if not leads:
-        write_block_pair(ws, row, "Примечание", "Достоверных новых лидов не найдено.")
-        return
 
-    row = write_block_heading(ws, row, "Общие показатели")
-    row = write_block_pair(
-        ws,
-        row,
-        "Всего перспективных объектов",
-        f"=COUNTA({column_range('project_name')})",
-        formula=True,
-    )
-    row += 1
+def report_location(lead: dict) -> str:
+    parts = []
+    for key in ("city", "region"):
+        value = lead[key]
+        if is_set(value) and value not in parts:
+            parts.append(value)
+    return ", ".join(parts) or NOT_SET
 
-    row = write_block_heading(ws, row, "Распределение по приоритетам")
-    for priority in PRIORITY_ORDER:
-        formula = f'=COUNTIF({column_range("priority")},"{priority}")'
-        row = write_block_pair(
-            ws, row, f"Приоритет {priority}", formula, formula=True
+
+def verified_fact(lead: dict) -> str:
+    facts = [
+        f"Заказчик: {lead['company_name']}"
+        if is_set(lead["company_name"])
+        else "",
+        f"Генподрядчик: {lead['general_contractor']}"
+        if is_set(lead["general_contractor"])
+        else "",
+        f"Стадия: {lead['stage']}" if is_set(lead["stage"]) else "",
+        f"Сроки: {lead['timeline']}" if is_set(lead["timeline"]) else "",
+        f"Бюджет: {lead['budget']}" if is_set(lead["budget"]) else "",
+        f"Масштаб: {lead['project_scale']}"
+        if is_set(lead["project_scale"])
+        else "",
+    ]
+    return "; ".join(fact for fact in facts if fact) or NOT_SET
+
+
+def report_scale(lead: dict) -> str:
+    parts = [
+        value
+        for value in (lead["budget"], lead["project_scale"])
+        if is_set(value)
+    ]
+    return "; ".join(parts) or NOT_SET
+
+
+def project_contractor(lead: dict) -> str:
+    contractors = [
+        value
+        for value in (
+            lead["general_contractor"],
+            lead["finishing_subcontractor"],
         )
-    row += 1
+        if is_set(value)
+    ]
+    return "; ".join(contractors) or NOT_SET
 
-    row = write_block_heading(ws, row, "Топ-проекты в работе")
-    for name in summary["top_projects"] or [lead["project_name"] for lead in leads[:4]]:
-        put(ws, row, 1, name)
-        row += 1
-    row += 1
 
-    row = write_block_heading(ws, row, "Первоочередные действия отдела продаж")
-    for idx, action in enumerate(summary["priority_actions"], start=1):
-        row = write_block_pair(ws, row, f"Действие {idx}", action)
-    row += 1
+def project_contact(lead: dict) -> str:
+    for key in ("contact_person", "general_contractor", "company_name"):
+        if is_set(lead[key]):
+            return lead[key]
+    return NOT_SET
 
-    row = write_block_heading(ws, row, "Технологический радар / ИИ и автоматизация")
-    write_block_pair(ws, row, "Новость / Тренд", summary["tech_news"])
+
+def project_risks(lead: dict) -> str:
+    if is_set(lead["risk_check"]):
+        return lead["risk_check"]
+    missing = [
+        label
+        for key, label in (
+            ("general_contractor", "генподрядчик"),
+            ("contact_person", "контактное лицо"),
+            ("phone", "телефон"),
+            ("offer_deadline", "срок предложения"),
+            ("budget", "бюджет"),
+        )
+        if not is_set(lead[key])
+    ]
+    if missing:
+        return "Не установлено в источниках: " + ", ".join(missing)
+    return NOT_SET
+
+
+def report_date_label(value: str) -> str:
+    months = (
+        "января",
+        "февраля",
+        "марта",
+        "апреля",
+        "мая",
+        "июня",
+        "июля",
+        "августа",
+        "сентября",
+        "октября",
+        "ноября",
+        "декабря",
+    )
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError:
+        return value
+    return f"{parsed.day} {months[parsed.month - 1]} {parsed.year} года"
+
+
+def radar_summary(report: dict) -> str:
+    leads = report["leads"]
+    if not leads:
+        return "За выбранный период новых подтвержденных лидов не найдено."
+
+    priority_names = [
+        lead["project_name"] for lead in leads if lead["priority"] == "A"
+    ][:3]
+    actions = as_list(report["summary"].get("priority_actions"))[:2]
+    parts = [f"Найдено частных проектов: {len(leads)}."]
+    if priority_names:
+        parts.append("Приоритетно: " + "; ".join(priority_names) + ".")
+    if actions:
+        action_text = "; ".join(
+            action.rstrip(" .;") for action in actions if isinstance(action, str)
+        )
+        if action_text:
+            parts.append("Первые действия: " + action_text + ".")
+    return " ".join(parts)
+
+
+def write_report_sheet(
+    ws: Worksheet,
+    title: str,
+    columns: list,
+    rows: list[dict],
+    subtitle: Optional[str] = None,
+) -> None:
+    last_column = get_column_letter(len(columns))
+    ws.merge_cells(f"A1:{last_column}1")
+    put(ws, 1, 1, title, font=TITLE_FONT)
+    header_row = 3
+    if subtitle is not None:
+        ws.merge_cells(f"A2:{last_column}2")
+        put(ws, 2, 1, subtitle)
+        header_row = 4
+    fill_table_sheet(ws, columns, rows, header_row=header_row)
 
 
 def build_excel(report: dict, path: Path) -> None:
     leads = report["leads"]
-
     workbook = Workbook()
+
+    lead_by_name = {lead["project_name"]: lead for lead in leads}
+    summary = report["summary"]
+    top_names = [
+        name
+        for name in as_list(summary.get("top_projects"))
+        if name in lead_by_name
+    ][:4]
+    if not top_names:
+        top_names = [lead["project_name"] for lead in leads[:4]]
+
+    radar_rows = []
+    for lead in leads:
+        work_type = lead["work_type"]
+        if work_type in REPAIR_SHEET_TYPES:
+            signal_type = "РЕМОНТ / РЕКОНСТРУКЦИЯ"
+        elif is_set(lead["general_contractor"]):
+            signal_type = "ГЕНПОДРЯДЧИК ВЫБРАН"
+        else:
+            signal_type = "ЧАСТНЫЙ ПРОЕКТ"
+        radar_rows.append(
+            {
+                "publication_date": lead["publication_date"],
+                "signal_type": signal_type,
+                "project_name": lead["project_name"],
+                "location": report_location(lead),
+                "verified_fact": verified_fact(lead),
+                "clc_demand": lead["clc_demand"],
+                "rating": rating_label(lead["priority"]),
+                "source_link": lead["source_link"],
+            }
+        )
+
     radar_sheet = workbook.active
     radar_sheet.title = "Радар"
-    fill_table_sheet(radar_sheet, RADAR_COLUMNS, leads)
+    write_report_sheet(
+        radar_sheet,
+        f"CLC Company — деловая сводка, {report_date_label(report['report_date'])}",
+        RADAR_COLUMNS,
+        radar_rows,
+        subtitle=radar_summary(report),
+    )
 
+    project_rows = []
+    for name in top_names:
+        lead = lead_by_name[name]
+        project_rows.append(
+            {
+                "project_label": lead["project_name"],
+                "rating": rating_label(lead["priority"]),
+                "publication_date": lead["publication_date"],
+                "location": report_location(lead),
+                "stage": lead["stage"],
+                "scale": report_scale(lead),
+                "company_name": lead["company_name"],
+                "contractor": project_contractor(lead),
+                "clc_demand": lead["clc_demand"],
+                "contact": project_contact(lead),
+                "phone": lead["phone"],
+                "email": lead["email"],
+                "offer_deadline": lead["offer_deadline"],
+                "recommendation": lead["recommendation"],
+                "risk_check": project_risks(lead),
+                "source_link": lead["source_link"],
+            }
+        )
     projects_sheet = workbook.create_sheet("Проекты")
-    fill_table_sheet(projects_sheet, LEAD_COLUMNS, to_display_rows(leads))
+    write_report_sheet(
+        projects_sheet,
+        "Четыре приоритетных направления продаж CLC",
+        PROJECT_COLUMNS,
+        project_rows,
+    )
 
-    edu_leads = [
+    education_terms = (
+        "школ",
+        "детск",
+        "больниц",
+        "медиц",
+        "клиник",
+        "колледж",
+        "универ",
+    )
+    education_leads = [
         lead
         for lead in leads
-        if any(
-            word in lead["object_type"].lower()
-            for word in ("школ", "детск", "больниц", "медиц", "колледж", "универ")
-        )
+        if any(term in lead["object_type"].lower() for term in education_terms)
         or lead["work_type"] in REPAIR_SHEET_TYPES
     ]
-    edu_sheet = workbook.create_sheet("Образование и ремонты")
-    fill_table_sheet(edu_sheet, EDUCATION_COLUMNS, edu_leads if edu_leads else leads)
-
-    today_leads = [lead for lead in leads if lead["priority"] == "A"]
-    today_sheet = workbook.create_sheet("Отработать сегодня")
-    fill_table_sheet(today_sheet, TODAY_COLUMNS, today_leads)
-
-    tech_sheet = workbook.create_sheet("Технологии и ИИ")
-    tech_rows = report["summary"].get("analytics", [])
-    if not tech_rows and report["summary"].get("tech_news"):
-        tech_rows = [
-            {
-                "project_name": "Общий тренд",
-                "fact": report["summary"]["tech_news"],
-                "impact": "Автоматизация процессов",
-                "action": "Внедрить в CRM",
-            }
+    education_rows = []
+    for lead in education_leads:
+        status_parts = [
+            lead[key]
+            for key in ("stage", "timeline")
+            if is_set(lead[key])
         ]
-    fill_table_sheet(tech_sheet, TECH_COLUMNS, tech_rows)
+        education_rows.append(
+            {
+                "project_name": lead["project_name"],
+                "object_type": lead["object_type"],
+                "region": lead["region"],
+                "scale": report_scale(lead),
+                "stage": lead["stage"],
+                "current_status": "; ".join(status_parts) or NOT_SET,
+                "company_name": lead["company_name"],
+                "contractor": project_contractor(lead),
+                "clc_demand": lead["clc_demand"],
+                "procurement_status": (
+                    "Генподрядчик подтвержден"
+                    if is_set(lead["general_contractor"])
+                    else "Генподрядчик не установлен в источниках"
+                ),
+                "recommendation": lead["recommendation"],
+                "rating": rating_label(lead["priority"]),
+                "repair_control": NOT_SET,
+                "risk_check": project_risks(lead),
+                "source_link": lead["source_link"],
+            }
+        )
+    education_sheet = workbook.create_sheet("Образование и ремонты")
+    write_report_sheet(
+        education_sheet,
+        f"Образовательные, медицинские и ремонтные сигналы — {report_date_label(report['report_date'])}",
+        EDUCATION_COLUMNS,
+        education_rows,
+    )
 
-    summary_sheet = workbook.create_sheet("Сводка")
-    build_summary_sheet(summary_sheet, report, last_row=max(len(leads) + 1, 2))
+    today_leads = [
+        lead
+        for lead in leads
+        if lead["priority"] == "A" or is_set(lead["offer_deadline"])
+    ]
+    today_rows = []
+    for lead in today_leads:
+        contact_details = [
+            value
+            for value in (lead["contact_person"], lead["phone"], lead["email"])
+            if is_set(value)
+        ]
+        today_rows.append(
+            {
+                "project_label": lead["project_name"],
+                "responsible": "Назначить менеджера региона",
+                "recommendation": lead["recommendation"],
+                "contact": "; ".join(contact_details) or project_contact(lead),
+                "offer_deadline": lead["offer_deadline"],
+                "expected_result": lead["expected_result"],
+                "task_status": (
+                    "Критично"
+                    if is_set(lead["offer_deadline"])
+                    else {
+                        "A": "Высокий",
+                        "B": "Плановый",
+                        "C": "Наблюдать",
+                    }.get(lead["priority"], "Не установлено")
+                ),
+            }
+        )
+    today_sheet = workbook.create_sheet("Отработать сегодня")
+    write_report_sheet(
+        today_sheet,
+        "Отработать сегодня — задачи для CRM",
+        TODAY_COLUMNS,
+        today_rows,
+    )
+
+    technology_news = summary.get("technology_news", {})
+    if not isinstance(technology_news, dict):
+        technology_news = {}
+    technology_row = {
+        key: as_text(technology_news.get(key)) for key in TECH_NEWS_FIELDS
+    }
+    if not is_set(technology_row["verified_fact"]):
+        technology_row["verified_fact"] = as_text(summary.get("tech_news"))
+    if not is_set(technology_row["initiative"]) and is_set(
+        technology_row["verified_fact"]
+    ):
+        technology_row["initiative"] = "Технологическая новость"
+    technology_rows = [technology_row]
+    technology_title = (
+        "Технологии и ИИ — "
+        + (
+            technology_row["initiative"]
+            if is_set(technology_row["initiative"])
+            else "новость не установлена"
+        )
+    )
+    technology_sheet = workbook.create_sheet("Технологии и ИИ")
+    write_report_sheet(
+        technology_sheet,
+        technology_title,
+        TECH_COLUMNS,
+        technology_rows,
+    )
 
     workbook.save(path)
 
@@ -849,7 +1118,12 @@ def save_outputs(report: dict, retry: bool = False) -> Path:
         )
         logger.info("JSON saved: %s", json_path)
 
-    excel_path = OUTPUT_DIR / (f"report_retry_{stamp}.xlsx" if retry else f"report_{stamp}.xlsx")
+    filename = (
+        f"CLC_деловая_сводка_retry_{stamp}.xlsx"
+        if retry
+        else f"CLC_деловая_сводка_{stamp}.xlsx"
+    )
+    excel_path = OUTPUT_DIR / filename
     build_excel(report, excel_path)
     logger.info("Excel saved: %s", excel_path)
     return excel_path
@@ -1384,41 +1658,17 @@ def process_report(
     return report, excel_path
 
 
-def get_source_texts(stats: RunStats) -> list[str]:
-    texts: list[str] = []
-    jobs = build_search_jobs()
-    for number, (name, prompt) in enumerate(jobs, start=1):
-        logger.info("Search %d/%d: %s", number, len(jobs), name)
-        try:
-            text = search_projects_text(prompt)
-        except OpenAIAccessError as exc:
-            stats.add_error(f"OpenAI API недоступен: {exc}")
-            break
-        if text is None:
-            logger.warning("Search '%s' returned nothing", name)
-            continue
-        save_search_text(text, name)
-        texts.append(text)
-    if not texts:
+def get_source_text(stats: RunStats) -> Optional[str]:
+    try:
+        text = search_projects_text(render_search_prompt())
+    except OpenAIAccessError as exc:
+        stats.add_error(f"OpenAI API недоступен: {exc}")
+        return None
+    if text is None:
         stats.add_error("Поиск не вернул результат (см. лог)")
-    return texts
-
-
-def merge_reports(reports: list[dict]) -> dict:
-    merged: dict[str, Any] = {"leads": [], "summary": {
-        "top_projects": [], "analytics": [], "priority_actions": [],
-        "tech_news": NOT_SET,
-    }}
-    for report in reports:
-        merged["leads"] += [x for x in as_list(report.get("leads")) if isinstance(x, dict)]
-        summary = report.get("summary")
-        if not isinstance(summary, dict):
-            continue
-        for key in ("top_projects", "analytics", "priority_actions"):
-            merged["summary"][key] += as_list(summary.get(key))
-        if merged["summary"]["tech_news"] == NOT_SET and is_set(as_text(summary.get("tech_news"))):
-            merged["summary"]["tech_news"] = as_text(summary.get("tech_news"))
-    return merged
+        return None
+    save_search_text(text)
+    return text
 
 
 def get_raw_report(
@@ -1449,20 +1699,14 @@ def run_once(args: argparse.Namespace) -> RunStats:
         else:
             system_prompt = load_text(PROMPT_FILE)
             if args.input:
-                texts = [load_text(args.input)]
+                source_text = load_text(args.input)
             else:
-                texts = get_source_texts(stats)
-                if not texts:
+                source_text = get_source_text(stats)
+                if source_text is None:
                     return stats
-            source_text = "\n\n".join(texts)
-            raw_reports = []
-            for chunk in texts:
-                part = get_raw_report(chunk, system_prompt, stats)
-                if part is not None:
-                    raw_reports.append(part)
-            if not raw_reports:
+            raw_report = get_raw_report(source_text, system_prompt, stats)
+            if raw_report is None:
                 return stats
-            raw_report = merge_reports(raw_reports)
         report, excel_path = process_report(raw_report, source_text, stats, args)
     except Exception as exc:
         logger.exception("Pipeline crashed")
